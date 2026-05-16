@@ -1,4 +1,4 @@
-﻿namespace Quarkit.Models
+﻿namespace Quarkit.Models.Core
 {
     /// <summary>
     /// Defines the lifecycle stability levels of a version.

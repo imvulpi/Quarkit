@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Quarkit.Models
+namespace Quarkit.Models.Core
 {
     /// <summary>
     /// A memory-aligned, 10-byte fixed-size header representing a software version.
