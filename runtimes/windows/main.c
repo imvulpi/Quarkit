@@ -1,11 +1,6 @@
 #include <windows.h>
 #include "../shared/hooks.h"
-
-#ifdef MODULE_LOGGING
-/// @brief Outputs a simple message to the console.
-/// @param msg Contents of the message.
-extern void print(const char* msg);
-#endif
+#include "./modules/log.h"
 
 #ifdef MODULE_EXTRACTION
 /// @brief Extracts the embedded payload to a file.
@@ -18,9 +13,7 @@ extern void extract(const char* filename);
 int mainCRTStartup(){
     int stage = INIT;
     
-    #ifdef MODULE_LOGGING
     print("Starting the installation process...\n");
-    #endif
     
     #ifdef MODULE_EXTRACTION
         extract("extracted"); // Temporary name - later configured by cli/user.

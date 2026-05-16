@@ -1,10 +1,7 @@
 #define MODULE_EXTRACTION
 #ifdef MODULE_EXTRACTION
 #include <windows.h>
-
-#ifdef MODULE_LOGGING
-extern void print(const char* msg);
-#endif
+#include "../log.h"
 
 /* --- BriefLZ start --- */
 /* From BriefLZ - see: deps/brieflz */
@@ -77,18 +74,14 @@ void extract(const char* filename){
 
         if (read_be32(currentPtr + 0 * 4) != 0x626C7A1AUL /* "blz\x1A" */
             || read_be32(currentPtr + 1 * 4) != 1) {
-            #ifdef MODULE_LOGGING
             print("invalid header in compressed file");
-            #endif
             goto out;
         }
 
         /* Check blocksize is sufficient */
 		if (hdr_packedsize > max_block_size
 		 || hdr_depackedsize > blocksize) {
-            #ifdef MODULE_LOGGING
 			print("compressed file requires a bigger block size");
-			#endif
             goto out;
 		}
 

@@ -1,4 +1,5 @@
 #ifdef MODULE_LOGGING
+#include "log.h"
 #include <windows.h>
 /// @brief Logs a simple message to STD output.
 /// @param msg Contents of the message.
