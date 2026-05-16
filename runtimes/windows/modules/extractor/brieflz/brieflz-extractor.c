@@ -1,7 +1,8 @@
 #define MODULE_EXTRACTION
 #ifdef MODULE_EXTRACTION
+#include "../extractor.h"
+#include "../../log.h"
 #include <windows.h>
-#include "../log.h"
 
 /* --- BriefLZ start --- */
 /* From BriefLZ - see: deps/brieflz */

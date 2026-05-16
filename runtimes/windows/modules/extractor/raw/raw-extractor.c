@@ -1,4 +1,5 @@
 #ifdef MODULE_EXTRACTION
+#include "../extractor.h"
 #include <windows.h>
 
 /// @brief Pointer to the start of the binary payload.
