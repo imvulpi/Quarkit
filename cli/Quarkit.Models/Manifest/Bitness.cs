@@ -1,7 +1,15 @@
-﻿namespace Quarkit.Models.Manifest
+﻿using System.Text.Json.Serialization;
+
+namespace Quarkit.Models.Manifest
 {
-    public enum Bitness
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum Bitness : byte
     {
+        /// <summary>
+        /// The bitness of the system was not specified.
+        /// </summary>
+        None = 0,
+
         /// <summary>
         /// 32 bit systems.
         /// </summary>

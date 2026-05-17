@@ -1,30 +1,16 @@
 ﻿namespace Quarkit.Models.Manifest
 {
+
     public class InstallOptionsOverrides
-    {
+    {   
         /// <summary>
-        /// The target system.
+        /// Specifies which targets should these overrides handle.
         /// </summary>
-        public OperatingSystem? System { get; set; }
-        
-        /// <summary>
-        /// The target architecture.
-        /// </summary>
-        public Architecture? Architecture { get; set; }
-        
-        /// <summary>
-        /// The target bitness.
-        /// </summary>
-        public Bitness? Bitness { get; set; }
-        
+        public required TargetKey TargetKey { get; set; }
+
         /// <summary>
         /// Overrides to be applied for the specified target.
         /// </summary>
-        public InstallOptions? Options { get; set; }
-        
-        /// <summary>
-        /// Path to the directory or file which should be packed and extracted when installed.
-        /// </summary>
-        public string? TargetPath { get; set; }
+        public InstallOptions? Options { get; set; }        
     }
 }

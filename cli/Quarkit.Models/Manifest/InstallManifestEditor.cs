@@ -13,17 +13,25 @@
         public string? TargetPayloadSuffix { get; set; } // e.g., "/publish" or "/bin"
 
         /// <summary>
-        /// (Optional) Specifies which systems are supported and should generate installers for.
+        /// (Optional) Path to where the installers should be outputted to.
         /// </summary>
-        public List<OperatingSystem>? SupportedSystems { get; set; }
+        public string? OutputPath { get; set; }
 
         /// <summary>
-        /// (Optional) Specifies which cpu architectures are supported.
+        /// (Optional) Specifies which systems are supported and should generate installers for. <br />
+        /// On default it assumes support for all systems.
+        /// </summary>
+        public List<OSSystem>? SupportedSystems { get; set; }
+
+        /// <summary>
+        /// (Optional) Specifies which cpu architectures are supported.<br />
+        /// On default it assumes support for all architectures.
         /// </summary>
         public List<Architecture>? SupportedArchitectures { get; set; }
 
         /// <summary>
-        /// (Optional) Specifies the supported bitness.
+        /// (Optional) Specifies the supported bitness.<br />
+        /// On default it assumes support for all architectures.
         /// </summary>
         public List<Bitness>? SupportedBitnesses { get; set; }
 

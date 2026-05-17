@@ -26,5 +26,10 @@
         /// Path to the executable to be run after extraction.
         /// </summary>
         public string? ExecutableToLaunch { get; set; }
+
+        /// <summary>
+        /// Path to the directory or file which should be packed and extracted when installed.
+        /// </summary>
+        public string? TargetPath { get; set; }
     }
 }

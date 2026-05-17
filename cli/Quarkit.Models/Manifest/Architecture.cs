@@ -1,7 +1,15 @@
-﻿namespace Quarkit.Models.Manifest
+﻿using System.Text.Json.Serialization;
+
+namespace Quarkit.Models.Manifest
 {
-    public enum Architecture
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum Architecture : byte
     {
+        /// <summary>
+        /// The cpu architecture was not specified.
+        /// </summary>
+        None = 0,
+
         /// <summary>
         /// x86 Cpu Architecture (x86_32bit and x86_64 bit).
         /// </summary>
