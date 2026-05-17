@@ -1,8 +1,7 @@
-#define MODULE_EXTRACTION
 #ifdef MODULE_EXTRACTION
 #include "../extractor.h"
 #include "../../log.h"
-#include <windows.h>
+#include "../../../../shared/glue.h"
 
 /* --- BriefLZ start --- */
 /* From BriefLZ - see: deps/brieflz */
@@ -52,6 +51,13 @@ extern unsigned char _payload_start[];
 
 /// @brief Pointer to the end of the binary payload.
 extern unsigned char _payload_end[];
+
+__declspec(dllimport) HANDLE GetProcessHeap();
+__declspec(dllimport) HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, void* _lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+__declspec(dllimport) void* HeapAlloc(HANDLE hHeap, DWORD dwFlags, size_t dwBytes);
+__declspec(dllimport) WIN_BOOL HeapFree(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem);
+__declspec(dllimport) WIN_BOOL CloseHandle(HANDLE handle);
+__declspec(dllimport) WIN_BOOL WriteFile(HANDLE handle, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, void* _lpOverlapped);
 
 /// @brief Extracts and decompresses the data to the specified file.
 /// @param filename Path to the file.
