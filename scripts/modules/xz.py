@@ -7,25 +7,25 @@ from ..globals import MODULES_DIR
 def build(config: BuildConfig):
     print("Building the XZ LZMA module")
     sources = [
-        "deps/xz/liblzma/common/stream_buffer_decoder.c", 
-        "deps/xz/liblzma/common/stream_decoder.c", 
-        "deps/xz/liblzma/common/common.c", 
-        "deps/xz/liblzma/common/index_hash.c", 
-        "deps/xz/liblzma/check/check.c", 
-        "deps/xz/liblzma/common/block_header_decoder.c", 
-        "deps/xz/liblzma/common/filter_decoder.c", 
-        "deps/xz/liblzma/common/stream_flags_decoder.c", 
-        "deps/xz/liblzma/common/block_decoder.c", 
-        "deps/xz/liblzma/common/filter_common.c", 
-        "deps/xz/liblzma/common/block_util.c", 
-        "deps/xz/liblzma/common/vli_decoder.c", 
-        "deps/xz/liblzma/common/filter_flags_decoder.c", 
-        "deps/xz/liblzma/common/stream_flags_common.c", 
-        "deps/xz/liblzma/common/vli_size.c", 
-        "deps/xz/liblzma/check/crc32_small.c", 
-        "deps/xz/liblzma/lzma/lzma2_decoder.c", 
-        "deps/xz/liblzma/lzma/lzma_decoder.c", 
-        "deps/xz/liblzma/lz/lz_decoder.c"
+        "modules/xz/liblzma/common/stream_buffer_decoder.c", 
+        "modules/xz/liblzma/common/stream_decoder.c", 
+        "modules/xz/liblzma/common/common.c", 
+        "modules/xz/liblzma/common/index_hash.c", 
+        "modules/xz/liblzma/check/check.c", 
+        "modules/xz/liblzma/common/block_header_decoder.c", 
+        "modules/xz/liblzma/common/filter_decoder.c", 
+        "modules/xz/liblzma/common/stream_flags_decoder.c", 
+        "modules/xz/liblzma/common/block_decoder.c", 
+        "modules/xz/liblzma/common/filter_common.c", 
+        "modules/xz/liblzma/common/block_util.c", 
+        "modules/xz/liblzma/common/vli_decoder.c", 
+        "modules/xz/liblzma/common/filter_flags_decoder.c", 
+        "modules/xz/liblzma/common/stream_flags_common.c", 
+        "modules/xz/liblzma/common/vli_size.c", 
+        "modules/xz/liblzma/check/crc32_small.c", 
+        "modules/xz/liblzma/lzma/lzma2_decoder.c", 
+        "modules/xz/liblzma/lzma/lzma_decoder.c", 
+        "modules/xz/liblzma/lz/lz_decoder.c"
     ]
 
     output_dir = f"{MODULES_DIR}/{config.target_system}_{config.target_arch}/xz/"
