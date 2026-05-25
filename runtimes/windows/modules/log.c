@@ -11,7 +11,7 @@ __declspec(dllimport) int lstrlenA(LPCSTR lpString);
 void print(const char* msg) {
     HANDLE hOut = GetStdHandle(((DWORD)-11));
     if(hOut != INVALID_HANDLE_VALUE){
-        WriteFile(hOut, msg, (DWORD)lstrlenA(msg), NULL, NULL);
+        WriteFile(hOut, (unsigned char*)msg, (DWORD)lstrlenA(msg), NULL, NULL);
     }
 }
 #endif

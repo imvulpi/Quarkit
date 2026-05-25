@@ -12,6 +12,7 @@
 #endif
 
 typedef __SIZE_TYPE__ size_t;
+typedef unsigned char uint8_t;
 typedef void* HANDLE;
 typedef void* LPVOID;
 typedef void* HWND;
