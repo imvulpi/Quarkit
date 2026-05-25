@@ -25,14 +25,23 @@ def build(config: BuildConfig):
         "modules/xz/liblzma/check/crc32_small.c", 
         "modules/xz/liblzma/lzma/lzma2_decoder.c", 
         "modules/xz/liblzma/lzma/lzma_decoder.c", 
-        "modules/xz/liblzma/lz/lz_decoder.c"
+        "modules/xz/liblzma/lz/lz_decoder.c",
+        "modules/windows_glue.c"
     ]
 
     output_dir = f"{MODULES_DIR}/{config.target_system}_{config.target_arch}/xz/"
     os.makedirs(output_dir, exist_ok=True)
-    output_file = f"{output_dir}/liblzma.so"
 
     compiler: Compiler = make_compiler(config)
     compiler.add_sources(sources)
+    compiler.add_compilation_options(["-DHAVE_SMALL", "-DHAVE_DECODER_LZMA2", "-DHAVE_CHECK_CRC32", "-DHAVE_DECODERS", "-DHAVE__BOOL", "-DGLUE_SHARED"])
+    compiler.optimize_for_size()
+    compiler.disable_stdlib()
+    compiler.compile_shared(f"{output_dir}/liblzma.so", ["-s", "-lkernel32"])
+
+    # A separate compiler for static library
+    compiler = make_compiler(config)
+    compiler.add_sources(sources)
     compiler.add_compilation_options(["-DHAVE_SMALL", "-DHAVE_DECODER_LZMA2", "-DHAVE_CHECK_CRC32", "-DHAVE_DECODERS", "-DHAVE__BOOL"])
-    compiler.compile_shared(output_file)
+    compiler.optimize_for_size()
+    compiler.compile_static(f"{output_dir}/liblzma.a")

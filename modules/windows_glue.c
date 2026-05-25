@@ -74,3 +74,9 @@ void* memmove(void* destination, const void* source, size_t count) {
     }
     return destination;
 }
+
+#ifdef GLUE_SHARED
+int __stdcall DllMainCRTStartup(void* hinstDLL, uint32_t fdwReason, void* lpvReserved) {
+    return 1; 
+}
+#endif

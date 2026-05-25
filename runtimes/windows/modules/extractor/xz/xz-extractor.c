@@ -1,7 +1,6 @@
 #ifdef MODULE_EXTRACTION
 #include "../extractor.h"
 #include "../../log.h"
-#include "../../../../shared/glue.h"
 #include "../../../../../modules/xz/liblzma/common/stream_decoder.h"
 
 // Define the PAYLOAD_SIZE option to not guess the size.
@@ -15,10 +14,12 @@ extern unsigned char _payload_end[];
 __declspec(dllimport) HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, void* _lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 __declspec(dllimport) WIN_BOOL CloseHandle(HANDLE handle);
 __declspec(dllimport) WIN_BOOL WriteFile(HANDLE handle, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, void* _lpOverlapped);
-__declspec(dllimport) HANDLE GetProcessHeap();
-__declspec(dllimport) void* HeapAlloc(HANDLE hHeap, DWORD dwFlags, size_t dwBytes);
-__declspec(dllimport) WIN_BOOL HeapFree(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem);
-__declspec(dllimport) void* __stdcall HeapReAlloc(HANDLE hHeap, unsigned long dwFlags, void* lpMem, size_t dwBytes);
+
+// These are used but imported by the glue when using liblzma:  (We get the glue from stream_decoder.h)
+// __declspec(dllimport) HANDLE GetProcessHeap();
+// __declspec(dllimport) void* HeapAlloc(HANDLE hHeap, DWORD dwFlags, size_t dwBytes);
+// __declspec(dllimport) WIN_BOOL HeapFree(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem);
+// __declspec(dllimport) void* __stdcall HeapReAlloc(HANDLE hHeap, unsigned long dwFlags, void* lpMem, size_t dwBytes);
 
 /**
  * Decompresses an XZ/LZMA2 file from memory to a newly allocated memory buffer.

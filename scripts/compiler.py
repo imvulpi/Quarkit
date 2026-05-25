@@ -5,6 +5,7 @@ import subprocess
 
 from .build_enums import Arch, CompilerType, System
 from .build_config import BuildConfig
+from .globals import RUN_PARALLEL
 
 class Compiler(ABC):
     def __init__(self, config: BuildConfig, executable: str):
@@ -96,16 +97,17 @@ class ClangCompiler(Compiler):
     def optimize_for_size(self):
         self.flags.extend([
             "-Oz",
-            "-s",
             "-flto",
             "-fno-exceptions",
+            "-ffunction-sections",
+            "-fdata-sections"
         ])
         return self
 
     def compile_static(self, output_path):
         return super().compile_static(output_path)
 
-    def compile_shared(self, output_path: str):
+    def compile_shared(self, output_path: str, link_flags: list[str] = []):
         config_folder = f"{self.config.target_system}_{self.config.target_arch}"
         base_build_dir = os.path.join("build", config_folder)
         
@@ -137,16 +139,63 @@ class ClangCompiler(Compiler):
         with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
             self.objects = list(executor.map(compile_single, self.sources))
 
-        print(f"  Compiled {len(self.objects)} files successfully.")
+        print(f"  Compiled {len(self.sources)} files successfully.")
         
         link_cmd = (
             [self.executable, "-shared"]
+            + link_flags
             + self.flags
             + self.objects
             + ["-o", output_path]
         )
         subprocess.run(link_cmd, check=True)
         print(f"  Successfully created shared library: {output_path}")
+    
+    def compile_static(self, output_path: str):
+        config_folder = f"{self.config.target_system}_{self.config.target_arch}"
+        base_build_dir = os.path.join("build", config_folder)
+        
+        def compile_single(src):
+            obj = src.replace(".c", ".o")
+            rel_src = os.path.relpath(src)
+            rel_obj = os.path.splitext(rel_src)[0] + ".o"
+            obj = os.path.join(base_build_dir, rel_obj)
+            os.makedirs(os.path.dirname(obj), exist_ok=True)
+            
+            cmd = (
+                [self.executable]
+                + self.flags
+                + self.includes
+                + ["-c", src, "-o", obj]
+                + self.compilation_options
+            )
+
+            # Only compile newer:
+            if not os.path.exists(obj) or os.path.getmtime(src) > os.path.getmtime(
+                obj
+            ): subprocess.run(cmd, check=True)
+            
+            return obj
+
+        print("  Starting parallel compilation...")
+
+        if(RUN_PARALLEL):
+            with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+                self.objects = list(executor.map(compile_single, self.sources))
+        else:
+            self.objects = list()
+            for source in self.sources:
+                self.objects.append(compile_single(source))
+
+        print(f"  Compiled {len(self.objects)} files successfully.")
+
+        link_cmd = (
+            ["llvm-ar", "rcs", output_path] + self.objects
+        )
+
+        subprocess.run(link_cmd, check=True)
+
+        print(f"  Successfully created static library: {output_path}")
 
 
 def make_compiler(config: BuildConfig) -> Compiler:    

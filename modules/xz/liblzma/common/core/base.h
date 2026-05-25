@@ -12,6 +12,7 @@
 
 #pragma once
 #include "../../../../windows_glue.h"
+#include "../../../../xz_glue.h"
 
 /**
  * \brief       Boolean
