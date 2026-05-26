@@ -60,7 +60,6 @@ void* memmove(void* destination, const void* source, size_t count);
 #define GENERIC_WRITE 0x40000000
 #define HEAP_ZERO_MEMORY 0x00000008
 
-// __declspec(dllimport)
 __declspec(dllimport) extern void* __stdcall GetProcessHeap(void);
 __declspec(dllimport) extern void* __stdcall HeapAlloc(void* hHeap, unsigned long dwFlags, size_t dwBytes);
 __declspec(dllimport) extern void* __stdcall HeapReAlloc(void* hHeap, unsigned long dwFlags, void* lpMem, size_t dwBytes);

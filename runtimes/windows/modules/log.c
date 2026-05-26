@@ -1,6 +1,6 @@
 #ifdef MODULE_LOGGING
 #include "log.h"
-#include "../../shared/glue.h"
+#include "../../../modules/windows_glue.h"
 
 __declspec(dllimport) HANDLE GetStdHandle(DWORD nStdHandle);
 __declspec(dllimport) WIN_BOOL WriteFile(HANDLE hFile, unsigned char* lpVuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, void* lpOverlapped);
