@@ -57,7 +57,8 @@
             StartShortcut = true,
             AdminRequired = false,
             ExecutableToLaunch = null,
-            TargetPath = null
+            TargetPath = null,
+            Modules = null
         };
 
         /// <summary>
@@ -74,6 +75,7 @@
             if (source.AdminRequired != null) AdminRequired = source.AdminRequired;
             if (source.ExecutableToLaunch != null) ExecutableToLaunch = source.ExecutableToLaunch;
             if (source.TargetPath != null) TargetPath = source.TargetPath;
+            if (source.Modules != null) Modules = source.Modules;
         }
 
         /// <summary>
