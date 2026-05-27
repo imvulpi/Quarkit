@@ -5,7 +5,7 @@
     /// </summary>
     public class InstallOptions
     {
-        public string? AppId { get; set; }
+        public string? AppName { get; set; }
 
         /// <summary>
         /// Whether a desktop shorcut should be created, if the system supports it.

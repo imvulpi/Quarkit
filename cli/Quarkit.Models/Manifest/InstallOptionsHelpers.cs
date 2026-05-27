@@ -9,7 +9,7 @@
 
             return new InstallOptions
             {
-                AppId = overrideOptions.AppId ?? baseOptions.AppId,
+                AppName = overrideOptions.AppName ?? baseOptions.AppName,
                 DesktopShortcut = overrideOptions.DesktopShortcut ?? baseOptions.DesktopShortcut,
                 StartShortcut = overrideOptions.StartShortcut ?? baseOptions.StartShortcut,
                 AdminRequired = overrideOptions.AdminRequired ?? baseOptions.AdminRequired,

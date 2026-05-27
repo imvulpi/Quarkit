@@ -1,16 +1,26 @@
 ﻿namespace Quarkit.Models.Manifest
 {
-    public class InstallManifestEditor
+    public class AutoDiscovery
     {
         /// <summary>
         /// (Optional) The folder containing framework-compiled target triplets for auto-discovery.
         /// </summary>
-        public string? TargetRootDirectory { get; set; }
+        public required string TargetRootDirectory { get; set; }
 
         /// <summary>
         /// (Optional) A relative directory appended to discovered target folders to reach deployment binaries.
         /// </summary>
         public string? TargetPayloadSuffix { get; set; } // e.g., "/publish" or "/bin"
+    }
+
+    public class InstallManifestEditor
+    {
+        public InstallerCreatorOptions? CreatorOptions { get; set; }
+
+        /// <summary>
+        /// Options for auto discovery of targets.
+        /// </summary>
+        public AutoDiscovery? AutoDiscovery { get; set; }
 
         /// <summary>
         /// (Optional) Path to where the installers should be outputted to.
@@ -43,6 +53,6 @@
         /// <summary>
         /// A collection of selective updates applied to specific OS or architectural matrices.
         /// </summary>
-        public List<InstallOptionsOverrides> Overrides { get; set; } = [];
+        public List<InstallOptionsOverrides> Overrides { get; set; } = [];  
     }
 }
