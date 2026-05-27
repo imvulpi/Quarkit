@@ -31,6 +31,18 @@
         public string? ExecutableToLaunch { get; set; }
 
         /// <summary>
+        /// Modules to be included in these installation configuration.
+        /// </summary>
+        /// <remarks> 
+        /// You can use &lt;QK&gt;/ shorthand to provide an explicit path relative to the Quarkit root,
+        /// otherwise ./ is relative to the manifest file.<br></br> 
+        /// 
+        /// If no directory is found from the provided string then quarkit will attempt to find the module
+        /// based on its id or directory from common places.
+        /// </remarks>
+        public List<string>? Modules { get; set; }
+
+        /// <summary>
         /// Path to the directory or file which should be packed and extracted when installed.
         /// </summary>
         public string? TargetPath { get; set; }

@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-
-namespace Quarkit.Models.Manifest.Modules
+﻿namespace Quarkit.Models.Manifest.Modules
 {
     public class ModuleManifest
     {
