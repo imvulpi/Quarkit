@@ -5,22 +5,25 @@
     /// </summary>
     public class InstallOptions
     {
+        /// <summary>
+        /// Name of the application.
+        /// </summary>
         public string? AppName { get; set; }
 
         /// <summary>
         /// Whether a desktop shorcut should be created, if the system supports it.
         /// </summary>
-        public bool? DesktopShortcut { get; set; } = true;
+        public bool? DesktopShortcut { get; set; }
 
         /// <summary>
         /// Whether a shortcut should be created in the start menu, if the system supports it.
         /// </summary>
-        public bool? StartShortcut { get; set; } = true;
+        public bool? StartShortcut { get; set; }
 
         /// <summary>
         /// Whether admin permissions are required for the installer.
         /// </summary>
-        public bool? AdminRequired { get; set; } = false;
+        public bool? AdminRequired { get; set; }
 
         /// <summary>
         /// Path to the executable to be run after extraction.
@@ -31,5 +34,44 @@
         /// Path to the directory or file which should be packed and extracted when installed.
         /// </summary>
         public string? TargetPath { get; set; }
+
+        /// <summary>
+        /// Provides the absolute baseline defaults for Quarkit when nothing else is specified.
+        /// </summary>
+        public static InstallOptions GetGlobalDefaults() => new()
+        {
+            AppName = "MyQuarkitApp",
+            DesktopShortcut = true,
+            StartShortcut = true,
+            AdminRequired = false,
+            ExecutableToLaunch = null,
+            TargetPath = null
+        };
+
+        /// <summary>
+        /// Layers properties from a source options object onto this instance, 
+        /// ignoring any null values in the source.
+        /// </summary>
+        public void MergeFrom(InstallOptions source)
+        {
+            if (source == null) return;
+
+            if (source.AppName != null) AppName = source.AppName;
+            if (source.DesktopShortcut != null) DesktopShortcut = source.DesktopShortcut;
+            if (source.StartShortcut != null) StartShortcut = source.StartShortcut;
+            if (source.AdminRequired != null) AdminRequired = source.AdminRequired;
+            if (source.ExecutableToLaunch != null) ExecutableToLaunch = source.ExecutableToLaunch;
+            if (source.TargetPath != null) TargetPath = source.TargetPath;
+        }
+
+        /// <summary>
+        /// Helper to create a deep copy of an option set.
+        /// </summary>
+        public InstallOptions Clone()
+        {
+            var clone = new InstallOptions();
+            clone.MergeFrom(this);
+            return clone;
+        }
     }
 }
