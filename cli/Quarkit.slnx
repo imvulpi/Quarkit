@@ -2,4 +2,5 @@
   <Project Path="Quarkit.CLI/Quarkit.CLI.csproj" />
   <Project Path="Quarkit.Core/Quarkit.Core.csproj" />
   <Project Path="Quarkit.Models/Quarkit.Models.csproj" />
+  <Project Path="Quarkit.Tests/Quarkit.Tests.csproj" />
 </Solution>
