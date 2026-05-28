@@ -39,6 +39,34 @@ internal class Program
             switch (argument)
             {
                 case "new":
+                    if (EnsureHasValue(i, arguments.Count, argument))
+                    {
+                        string value = arguments[++i];
+                        switch (value)
+                        {
+                            case "installer":
+                                ManifestWizard.Run();
+                                break;
+                            case "inst":
+                                ManifestWizard.Run();
+                                break;
+                            case "module":
+                                ModuleWizard.Run();
+                                break;
+                            case "mod":
+                                ModuleWizard.Run();
+                                break;
+                            default:
+                                string incorrectNewArguments = $"The argument 'new' does not contain an option: '{value}'\n" +
+                                "    Options:\n" +
+                                "      (none)    - Implicitly launches the installer manifest wizard\n" +
+                                "      installer - Creates a new installer manifest.\n" +
+                                "      module    - Creates a module manifest.\n";
+                                Console.WriteLine(incorrectNewArguments);
+                                break;
+                        }
+                        break;
+                    }
                     ManifestWizard.Run();
                     break;
 
@@ -59,15 +87,19 @@ internal class Program
         string message = "Welcome to Quarkit.\n" +
                          "Arguments:\n" +
                          "  --help         | You are here :)\n" +
-                         "  --new          | Setup for a new installer manifest.";
+                         "  --new          | Launches wizards for installation or other manifests.\n" +
+                         "    Options:\n" +
+                         "      (none)    - Implicitly launches the installer manifest wizard.\n"+
+                         "      installer - Launches a installer manifest creation wizard.\n"+
+                         "      module    - Launches a module manifest creation wizard.\n";
         Console.WriteLine(message);
     }
 
-    static bool EnsureHasValue(int currentIndex, int totalCount, string flagName)
+    static bool EnsureHasValue(int currentIndex, int totalCount, string flagName, bool required = true)
     {
         if (currentIndex + 1 < totalCount) return true;
-
-        Console.WriteLine($"Error: The argument '{flagName}' requires a value after it.");
+        if(required) Console.WriteLine($"Error: The argument '{flagName}' requires a value after it.");
+        
         return false;
     }
 }
