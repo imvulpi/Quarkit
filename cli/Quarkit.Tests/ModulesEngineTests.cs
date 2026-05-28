@@ -3,6 +3,7 @@ using Quarkit.Core.Shorthand;
 using Quarkit.Models.Manifest.Modules;
 using Quarkit.Tests.Mocks;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Quarkit.Tests;
 
@@ -75,5 +76,46 @@ public class ModulesEngineTests
 
         string expandedVersion = shorthandEngine.Expand("App version is <ScrapedVersion>");
         await Assert.That(expandedVersion).IsEqualTo("App version is 2.5.9-beta");
+    }
+
+    [Test]
+    public async Task ResolveAndLoadModule_WithMalformedJson_ShouldThrowJsonException()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+
+        mockFs.CreateDirectory("C:/Project/modules/bad-json");
+        mockFs.WriteAllText("C:/Project/modules/bad-json/module.json",  "{ \"Name\": bad-module, "); // Name instead of Id, missing bracket "
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+
+        var action = () => engine.ResolveAndLoadModule("./modules/bad-json", "C:/Project");
+        await Assert.That(action).Throws<JsonException>();
+    }
+
+
+    [Test]
+    public async Task ResolveAndLoadModule_WithMissingRequiredJson_ShouldThrowJsonException()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+
+        mockFs.CreateDirectory("C:/Project/modules/bad-json");
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - Disabled to simulate bad json.
+        mockFs.WriteAllText("C:/Project/modules/bad-json/module.json", JsonSerializer.Serialize(
+                new ModuleManifest() { 
+                    Id = null, 
+                    Version = null, 
+                    CSources = ["./src/bad-code.c"] 
+                },
+                new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }
+            )
+        );
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type. - Disabled to simulate bad json.
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+
+        var action = () => engine.ResolveAndLoadModule("./modules/bad-json", "C:/Project");
+        await Assert.That(action).Throws<JsonException>();
     }
 }
