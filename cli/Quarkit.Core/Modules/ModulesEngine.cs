@@ -127,6 +127,23 @@ namespace Quarkit.Core.Modules
                 string arguments = command.Arguments == null ? string.Empty : shorthandEngine.Expand(command.Arguments, contextTokens);
 
                 (int exitCode, string output, string error) = _processRunner.Execute(executable, arguments);
+
+                command.SuccessCodes ??= [0]; // Default success code
+                if (!command.SuccessCodes.Contains(exitCode))
+                {
+                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{command.Executable} {command.Arguments}` and it failed with: {exitCode} exit code.\nStandardError output: {error}");
+                }
+
+                if(command.FailIfOutputContains != null && (output.Contains(command.FailIfOutputContains) || error.Contains(command.FailIfOutputContains)))
+                {
+                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{command.Executable} {command.Arguments}`, and the output contains {command.FailIfOutputContains} which signifies failure.\nStandardError output: {error}");
+                }
+
+                if(command.FailOnStdErr != null && command.FailOnStdErr.Value && error != string.Empty)
+                {
+                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{command.Executable} {command.Arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
+                }
+
                 if (command.CaptureVariables)
                 {
                     // TODO: This could use a bit more checking:
