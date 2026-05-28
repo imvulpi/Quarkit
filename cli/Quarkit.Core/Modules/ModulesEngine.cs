@@ -109,7 +109,21 @@ namespace Quarkit.Core.Modules
                     { "<QK>", _qkRoot }
                 };
 
-                string executable = shorthandEngine.Expand(command.Executable, contextTokens);
+                string executable = executable = shorthandEngine.Expand(command.Executable, contextTokens);
+                if (!command.Executable.StartsWith("<QK>")) // No root
+                {
+                    string possibleExecutable = Path.Combine(loadedModule.ModuleDirectory, executable);
+                    if (_fileSystem.FileExists(possibleExecutable)) // Prefer local executables.
+                    {
+                        executable = possibleExecutable;
+                    }
+                    else if (command.Executable.StartsWith("./") || command.Executable.StartsWith("./")) // Forced a local executable
+                    {
+                        throw new InvalidDataException($"Module: {loadedModule.Manifest.Id} " +
+                            $"tried to execute {command.Executable}, but there is no LOCAL {command.Executable}. Did you mean {command.Executable[2..]}?");
+                    }
+                }  // Otherwise it may be a executable registered in Paths of the system so we dont do anything.
+
                 string arguments = command.Arguments == null ? string.Empty : shorthandEngine.Expand(command.Arguments, contextTokens);
 
                 (int exitCode, string output, string error) = _processRunner.Execute(executable, arguments);
@@ -120,7 +134,7 @@ namespace Quarkit.Core.Modules
                     for (int i = 0; i < lines.Length; i++)
                     {
                         string line = lines[i].Trim();
-                        if (line.Contains("=")) // Very simple check
+                        if (line.Contains('=')) // Very simple check
                         {
                             string[] kv = line.Split('=');
                             if(kv.Length >= 2)

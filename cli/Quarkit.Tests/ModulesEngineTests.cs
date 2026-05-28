@@ -2,6 +2,7 @@
 using Quarkit.Core.Shorthand;
 using Quarkit.Models.Manifest.Modules;
 using Quarkit.Tests.Mocks;
+using System.Data;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -93,7 +94,6 @@ public class ModulesEngineTests
         await Assert.That(action).Throws<JsonException>();
     }
 
-
     [Test]
     public async Task ResolveAndLoadModule_WithMissingRequiredJson_ShouldThrowJsonException()
     {
@@ -117,5 +117,85 @@ public class ModulesEngineTests
 
         var action = () => engine.ResolveAndLoadModule("./modules/bad-json", "C:/Project");
         await Assert.That(action).Throws<JsonException>();
+    }
+
+    [Test]
+    public async Task RunPreBuildCommands_ShouldAnchorRelativeExecutablesToModuleDirectory()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+        var shorthandEngine = new ShorthandEngine();
+
+        mockFs.WriteAllText("C:/Project/modules/local-tool/tools/compress.exe", "Mock compress.exe :)");
+        var loadedModule = new LoadedModule
+        {
+            ModuleDirectory = "C:/Project/modules/local-tool",
+            Manifest = new ModuleManifest
+            {
+                Id = "local-tool",
+                Version = "1.0.0",
+                PreBuildCommands =
+                [
+                    new() { Executable = "tools/compress.exe", Arguments = "--run" }
+                ]
+            }
+        };
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+        engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        await Assert.That(MockFileSystem.Normalize(mockRunner.History[0].Filename)).IsEqualTo("C:/Project/modules/local-tool/tools/compress.exe");
+    }
+
+    [Test]
+    public async Task RunPreBuildCommands_ShouldAnchorExplicitQKExecutablesToQKRootDirectory()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+        var shorthandEngine = new ShorthandEngine();
+        shorthandEngine.SetToken("<QK>", "C:/QuarkitCore");
+
+        var loadedModule = new LoadedModule
+        {
+            ModuleDirectory = "C:/Project/modules/local-tool",
+            Manifest = new ModuleManifest
+            {
+                Id = "local-tool",
+                Version = "1.0.0",
+                PreBuildCommands =
+                [
+                    new() { Executable = "<QK>/tools/compress.exe", Arguments = "--run" } // Explicit <QK> root
+                ]
+            }
+        };
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+        engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        await Assert.That(MockFileSystem.Normalize(mockRunner.History[0].Filename)).IsEqualTo("C:/QuarkitCore/tools/compress.exe");
+    }
+
+    [Test]
+    public async Task RunPreBuildCommands_ErrorsWhenExplicitlyLocalExecutableIsMissing()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+        var shorthandEngine = new ShorthandEngine();
+
+        var loadedModule = new LoadedModule
+        {
+            ModuleDirectory = "C:/Project/modules/local-tool",
+            Manifest = new ModuleManifest
+            {
+                Id = "local-tool",
+                Version = "1.0.0",
+                PreBuildCommands =
+                [
+                    new() { Executable = "./tools/compress.exe", Arguments = "--run" }
+                ]
+            }
+        };
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        await Assert.That(action).Throws<InvalidDataException>();
     }
 }
