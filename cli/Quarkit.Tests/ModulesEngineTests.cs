@@ -198,4 +198,97 @@ public class ModulesEngineTests
         var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
         await Assert.That(action).Throws<InvalidDataException>();
     }
+
+    [Test]
+    public async Task RunPreBuildCommands_WhenScriptFails_ShouldSurfaceErrorAndHalt()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+        var shorthandEngine = new ShorthandEngine();
+
+        // Mimics python error:
+        mockRunner.PlannedOutputs["python crash.py"] = (1, "", "SyntaxError: invalid syntax at line 4"); // By default anything that isn't 0 fails.
+
+        var loadedModule = new LoadedModule
+        {
+            ModuleDirectory = "C:/Project/modules/broken",
+            Manifest = new ModuleManifest
+            {
+                Id = "broken-module",
+                Version = "1.0.0",
+                PreBuildCommands = new List<ModuleCommand>
+                {
+                    new() { Executable = "python", Arguments = "crash.py" }
+                }
+            }
+        };
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+
+        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        var exception = await Assert.That(action).Throws<Exception>();
+        await Assert.That(exception?.Message).Contains("SyntaxError: invalid syntax at line 4");
+    }
+
+    [Test]
+    public async Task RunPreBuildCommands_WithSuccessCodes_DoesNotError()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+        var shorthandEngine = new ShorthandEngine();
+
+        mockRunner.PlannedOutputs["python regular.py"] = (10, "Success! Code 10.", "");
+
+        var loadedModule = new LoadedModule
+        {
+            ModuleDirectory = "C:/Project/modules/regular",
+            Manifest = new ModuleManifest
+            {
+                Id = "regular-module",
+                Version = "1.0.0",
+                PreBuildCommands = new List<ModuleCommand>
+                {
+                    new() { Executable = "python", Arguments = "regular.py", SuccessCodes = [10] }
+                }
+            }
+        };
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+
+        await Assert.That(action).ThrowsNothing();
+    }
+
+    [Test]
+    public async Task RunPreBuildCommands_FailsWhenContainingADefinedStdErrPhrase()
+    {
+        var mockFs = new MockFileSystem();
+        var mockRunner = new MockProcessRunner();
+        var shorthandEngine = new ShorthandEngine();
+
+        mockRunner.PlannedOutputs["python stderr-fail.py"] = (0, "", "CRITICAL ERROR");
+
+        var loadedModule = new LoadedModule
+        {
+            ModuleDirectory = "C:/Project/modules/stderr-fail",
+            Manifest = new ModuleManifest
+            {
+                Id = "stderr-fail-module",
+                Version = "1.0.0",
+                PreBuildCommands = new List<ModuleCommand>
+                {
+                    new() { Executable = "python", Arguments = "stderr-fail.py", FailIfOutputContains = "CRITICAL ERROR" }
+                }
+            }
+        };
+
+        var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
+        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+
+        await Assert.That(action).Throws<Exception>();
+
+        mockRunner.PlannedOutputs["python stderr-fail.py"] = (0, "CRITICAL ERROR", ""); // Should work on regular STDOUT too.
+
+        await Assert.That(action).Throws<Exception>();
+    }
 }
