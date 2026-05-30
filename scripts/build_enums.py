@@ -10,12 +10,19 @@ class System(Enum):
         return self.name.lower()
 
 class Arch(Enum):
-    X64 = auto()
-    ARM64 = auto()
-    X86 = auto()  # 32 Bit.
-    
+    x86 = auto()
+    Arm = auto()
+    RiscV = auto()
+
     def __str__(self):
         return self.name.lower()
+    
+class Bitness(Enum):
+    x32 = auto()
+    x64 = auto()
+
+    def __str__(self):
+        return self.name.removeprefix('x')
 
 class CompilerType(Enum):
     GCC = auto()

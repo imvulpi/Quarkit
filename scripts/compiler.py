@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import subprocess
 
-from .build_enums import Arch, CompilerType, System
+from .build_enums import Arch, Bitness, CompilerType, System
 from .build_config import BuildConfig
 from .globals import RUN_PARALLEL
 
@@ -52,6 +52,11 @@ class Compiler(ABC):
     @abstractmethod
     def compile_shared(self, output_path: str):
         """Execute compilation to a shared (.so / .dll) library."""
+        pass
+    
+    @abstractmethod
+    def compile_executable(self, output_path: str):
+        """Execute compilation to a executable (.exe / linux executable)."""
         pass
 
 class GccCompiler(Compiler):
@@ -108,9 +113,9 @@ class ClangCompiler(Compiler):
         return super().compile_static(output_path)
 
     def compile_shared(self, output_path: str, link_flags: list[str] = []):
-        config_folder = f"{self.config.target_system}_{self.config.target_arch}"
+        config_folder = f"{self.config.get_triple()}"
         base_build_dir = os.path.join("build", config_folder)
-        
+
         def compile_single(src):
             obj = src.replace(".c", ".o")
             rel_src = os.path.relpath(src)
@@ -152,7 +157,7 @@ class ClangCompiler(Compiler):
         print(f"  Successfully created shared library: {output_path}")
     
     def compile_static(self, output_path: str):
-        config_folder = f"{self.config.target_system}_{self.config.target_arch}"
+        config_folder = f"{self.config.get_triple()}"
         base_build_dir = os.path.join("build", config_folder)
         
         def compile_single(src):
@@ -196,7 +201,57 @@ class ClangCompiler(Compiler):
         subprocess.run(link_cmd, check=True)
 
         print(f"  Successfully created static library: {output_path}")
+    
+    def compile_executable(self, output_path: str):
+        config_folder = f"{self.config.get_triple()}"
+        base_build_dir = os.path.join("build", config_folder)
+        
+        def compile_single(src):
+            obj = src.replace(".c", ".o")
+            rel_src = os.path.relpath(src)
+            rel_obj = os.path.splitext(rel_src)[0] + ".o"
+            obj = os.path.join(base_build_dir, rel_obj)
+            os.makedirs(os.path.dirname(obj), exist_ok=True)
+            
+            cmd = (
+                [self.executable]
+                + self.flags
+                + self.includes
+                + ["-c", src, "-o", obj]
+                + self.compilation_options
+            )
 
+            # Only compile newer:
+            if not os.path.exists(obj) or os.path.getmtime(src) > os.path.getmtime(
+                obj
+            ): subprocess.run(cmd, check=True)
+            
+            return obj
+
+        print("  Starting parallel compilation...")
+
+        if(RUN_PARALLEL):
+            with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+                self.objects = list(executor.map(compile_single, self.sources))
+        else:
+            self.objects = list()
+            for source in self.sources:
+                self.objects.append(compile_single(source))
+
+        print(f"  Compiled {len(self.objects)} files successfully.")
+
+        link_cmd = (
+            [self.executable] 
+            + self.flags 
+            + self.includes 
+            + self.objects
+            + ["-o", output_path] 
+        )
+
+        subprocess.run(link_cmd, check=True)
+
+        print(f"  Successfully created executable: {output_path}")
+    
 
 def make_compiler(config: BuildConfig) -> Compiler:    
     compiler: Compiler
@@ -205,7 +260,7 @@ def make_compiler(config: BuildConfig) -> Compiler:
             gcc_name = get_gcc_name_windows(config.target_arch)
             compiler = GccCompiler(config, gcc_name)
         else:
-            clang_target = get_clang_target_windows(config.host_system, config.target_arch)
+            clang_target = get_clang_target_windows(config.target_arch, config.target_bitness)
             compiler = ClangCompiler(config)
             compiler.flags.append("-target")
             compiler.flags.append(clang_target)
@@ -214,42 +269,49 @@ def make_compiler(config: BuildConfig) -> Compiler:
             gcc_name = get_gcc_name_linux(config.target_arch)
             compiler = GccCompiler(config, gcc_name)
         else:
-            clang_target = get_clang_target_linux(config.host_system, config.target_arch)
+            clang_target = get_clang_target_linux(config.target_arch, config.target_bitness)
             compiler = ClangCompiler(config)
             compiler.flags.append("-target")
             compiler.flags.append(clang_target)
     
     return compiler    
 
-def get_gcc_name_windows(target_arch: Arch):
-    if target_arch == Arch.X64:
+def get_gcc_name_windows(target_arch: Arch, target_bitness: Bitness):
+    if target_arch == Arch.x86 and target_bitness == Bitness.x64:
         return "x86_64-w64-mingw32-gcc"
-    elif target_arch == Arch.X86:
+    elif target_arch == Arch.x86 and target_bitness == Bitness.x32:
         return "i686-w64-mingw32-gcc"
-    elif target_arch == Arch.ARM64:
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x64:
         return "aarch64-w64-mingw32-gcc"
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x32:
+        return "armv7-w64-mingw32-gcc" 
     
-def get_gcc_name_linux(target_arch: Arch):
-    if target_arch == Arch.X64:
-        return "aarch64-linux-gnu-gcc"
-    elif target_arch == Arch.X86:
-        return "arm-linux-gnueabihf-gcc"
-    elif target_arch == Arch.ARM64:
+def get_gcc_name_linux(target_arch: Arch, target_bitness: Bitness):
+    if target_arch == Arch.x86 and target_bitness == Bitness.x64:
+        return "x86_64-linux-gnu-gcc"
+    elif target_arch == Arch.x86 and target_bitness == Bitness.x32:
         return "i686-linux-gnu-gcc"
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x64:
+        return "aarch64-linux-gnu-gcc"
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x32:
+        return "arm-linux-gnueabihf-gcc"
 
-def get_clang_target_windows(host_system: System, target_arch: Arch):
-    if target_arch == Arch.X64:
+def get_clang_target_windows(target_arch: Arch, target_bitness: Bitness):
+    if target_arch == Arch.x86 and target_bitness == Bitness.x64:
         return "x86_64-w64-windows-gnu"
-    elif target_arch == Arch.X86:
+    elif target_arch == Arch.x86 and target_bitness == Bitness.x32:
         return "i686-w64-windows-gnu"
-    elif target_arch == Arch.ARM64:
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x64:
         return "aarch64-w64-windows-gnu"
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x32:
+        return "armv7-w64-windows-gnu"        
         
-def get_clang_target_linux(host_system: System, target_arch: Arch):
-    if host_system == System.LINUX:
-        if target_arch == Arch.X64:
-            return "x86_64-linux-gnu"
-        elif target_arch == Arch.X86:
-            return "aarch64-linux-gnu"
-        elif target_arch == Arch.ARM64:
-            return "i686-linux-gnu"
+def get_clang_target_linux(target_arch: Arch, target_bitness: Bitness):
+    if target_arch == Arch.x86 and target_bitness == Bitness.x64:
+        return "x86_64-linux-gnu"
+    elif target_arch == Arch.x86 and target_bitness == Bitness.x32:
+        return "i686-linux-gnu"
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x64:
+        return "aarch64-linux-gnu"
+    elif target_arch == Arch.Arm and target_bitness == Bitness.x32:
+        return "arm-linux-gnueabihf"

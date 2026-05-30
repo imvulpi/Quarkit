@@ -1,5 +1,7 @@
 import os
 
+from scripts.build_enums import Arch
+
 from ..build_config import BuildConfig
 from ..compiler import Compiler, make_compiler
 from ..globals import MODULES_DIR
@@ -29,7 +31,7 @@ def build(config: BuildConfig):
         "modules/windows_glue.c"
     ]
 
-    output_dir = f"{MODULES_DIR}/{config.target_system}_{config.target_arch}/xz/"
+    output_dir = f"{MODULES_DIR}xz/{config.get_triple()}"
     os.makedirs(output_dir, exist_ok=True)
 
     compiler: Compiler = make_compiler(config)
@@ -37,7 +39,11 @@ def build(config: BuildConfig):
     compiler.add_compilation_options(["-DHAVE_SMALL", "-DHAVE_DECODER_LZMA2", "-DHAVE_CHECK_CRC32", "-DHAVE_DECODERS", "-DHAVE__BOOL", "-DGLUE_SHARED"])
     compiler.optimize_for_size()
     compiler.disable_stdlib()
-    compiler.compile_shared(f"{output_dir}/liblzma.so", ["-s", "-lkernel32"])
+    link_flags = ["-s", "-lkernel32"]
+    if(config.target_arch == Arch.Arm):
+        link_flags.append("-lclang_rt.builtins-arm")
+
+    compiler.compile_shared(f"{output_dir}/liblzma.so", link_flags)
 
     # A separate compiler for static library
     compiler = make_compiler(config)

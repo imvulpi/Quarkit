@@ -23,6 +23,6 @@ namespace Quarkit.Models.Manifest
         /// <summary>
         /// MacOS system.
         /// </summary>
-        Macos
+        MacOS
     }
 }
