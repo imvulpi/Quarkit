@@ -11,7 +11,6 @@
  */
 
 #pragma once
-#include "../../../../windows_glue.h"
 #include "filter.h"
 #include "check.h"
 #include "lzma12.h"

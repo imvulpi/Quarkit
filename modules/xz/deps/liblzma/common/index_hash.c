@@ -12,7 +12,6 @@
 #include "common.h"
 #include "index.h"
 #include "../check/check.h"
-#include "../../../windows_glue.h"
 
 typedef struct {
 	/// Sum of the Block sizes (including Block Padding)

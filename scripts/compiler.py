@@ -141,8 +141,13 @@ class ClangCompiler(Compiler):
         print("  Starting parallel compilation...")
         
         # Compile in parallel
-        with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-            self.objects = list(executor.map(compile_single, self.sources))
+        if(RUN_PARALLEL):
+            with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+                self.objects = list(executor.map(compile_single, self.sources))
+        else:
+            self.objects = list()
+            for source in self.sources:
+                self.objects.append(compile_single(source))
 
         print(f"  Compiled {len(self.sources)} files successfully.")
         

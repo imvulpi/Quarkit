@@ -11,7 +11,6 @@
  */
 
 #pragma once
-#include "../../../../windows_glue.h"
 #include "base.h"
 
 /**

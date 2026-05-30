@@ -15,7 +15,7 @@
 // #include "../../common/sysdefs.h"
 // #include "../../common/mythread.h"
 // #include "../../common/tuklib_integer.h"
-#include "../../../windows_glue.h"
+#include "quarkit_glue.h"
 #include "./core/filter.h"
 
 // LZMA_API_EXPORT is used to mark the exported API functions.

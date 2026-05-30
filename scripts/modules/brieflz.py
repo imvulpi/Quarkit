@@ -7,11 +7,11 @@ from ..globals import MODULES_DIR
 def build(config: BuildConfig):
     print("Building the brieflz module")
     sources = [
-        "modules/brieflz/blzpack.c", 
-        "modules/brieflz/brieflz.c", 
-        "modules/brieflz/parg.c", 
-        "modules/brieflz/depack.c", 
-        "modules/brieflz/depacks.c"
+        "modules/deps/brieflz/blzpack.c", 
+        "modules/deps/brieflz/brieflz.c", 
+        "modules/deps/brieflz/parg.c", 
+        "modules/deps/brieflz/depack.c", 
+        "modules/deps/brieflz/depacks.c"
     ]
         
     output_dir = f"{MODULES_DIR}/brieflz/{config.get_triple()}"

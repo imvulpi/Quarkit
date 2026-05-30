@@ -11,7 +11,7 @@
  */
 
 #pragma once
-#include "../../../../windows_glue.h"
+#include "quarkit_glue.h"
 
 /**
  * \brief       Type of the integrity check (Check ID)
