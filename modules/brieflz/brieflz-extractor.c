@@ -1,7 +1,6 @@
 #ifdef MODULE_EXTRACTION
-#include "../extractor.h"
-#include "../../log.h"
-#include "../../../../shared/glue.h"
+#include "log.h"
+#include "../windows_glue.h"
 
 /* --- BriefLZ start --- */
 /* From BriefLZ - see: deps/brieflz */

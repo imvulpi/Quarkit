@@ -1,7 +1,6 @@
 #ifdef MODULE_EXTRACTION
-#include "../extractor.h"
-#include "../../log.h"
-#include "../../../../../modules/xz/liblzma/common/stream_decoder.h"
+#include "log.h"
+#include "./deps/liblzma/common/stream_decoder.h"
 
 // Define the PAYLOAD_SIZE option to not guess the size.
 

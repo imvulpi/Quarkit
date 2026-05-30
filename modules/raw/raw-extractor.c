@@ -1,6 +1,5 @@
 #ifdef MODULE_EXTRACTION
-#include "../extractor.h"
-#include "../../../../../modules/windows_glue.h"
+#include "../modules/windows_glue.h"
 
 /// @brief Pointer to the start of the binary payload.
 extern unsigned char _payload_start[];

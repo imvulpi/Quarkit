@@ -1,7 +1,3 @@
-#include "../shared/hooks.h"
-#include "./modules/log.h"
-#include "./modules/extractor/extractor.h"
-
 /* 
 * Reasoing behind using `__declspec(dllimport)` instead of `windows.h`:
 * For some reason when using `windows.h` the functions never get inlined even when it would be optimal for it to be inlined, (e.g. single call)
@@ -18,16 +14,15 @@
 * For optimal size the __declspec(dllimport) should be preferred over `windows.h`  
 */
 
+#ifndef QUARKIT_MODULE_INITS
+#define QUARKIT_MODULE_INITS
+#endif
+
 __declspec(dllimport) void ExitProcess(unsigned int code);
 
-/// @brief Main windows installer entry. Runs core modules. 
-/// @return 0 if no errors.
-int mainCRTStartup(){
-    int stage = INIT;
-    
-    print("Starting the installation process...\n");
-    extract("extracted"); // Temporary name - later configured by cli/user.
-
+/// @brief Method that invokes module functions.
+int mainCRTStartup(){  
+    QUARKIT_MODULE_INITS
     ExitProcess(0);
     return 0;
 }
