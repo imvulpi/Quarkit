@@ -1,9 +1,27 @@
 ﻿using Quarkit.Models.Manifest;
+using System.Text.Json;
 
 namespace Quarkit.Core.Installation;
 
 public class InstallationManifestEngine
 {
+    /// <summary>
+    /// Loads a manifest or returns null if one cannot be loaded.
+    /// </summary>
+    /// <param name="path">Path to the manifest.</param>
+    /// <returns>Install manifest or null</returns>
+    public InstallManifestEditor? Load(string path)
+    {
+        if (File.Exists(path))
+        {
+            return JsonSerializer.Deserialize<InstallManifestEditor>(File.ReadAllText(path));
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Resolves the absolute, flat configuration for a single concrete target 
     /// by layering matching overrides on top of the defaults.
