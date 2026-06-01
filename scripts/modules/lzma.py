@@ -99,4 +99,4 @@ def build_lzma_compressor(config: BuildConfig, output_dir: str):
     compiler.add_sources(sources)
     compiler.add_compilation_options(["-Iinstaller/shared/include", "-DHAVE_ENCODER_LZMA2", "-DHAVE_ENCODER_LZMA1", "-DHAVE_CHECK_CRC32", "-DHAVE_ENCODERS", 
                                       "-DHAVE__BOOL", "-DCONDITIONAL_MATCH_FINDERS", "-DHAVE_MF_HC3", "-DHAVE_MF_HC4", "-DHAVE_MF_BT2", "-DHAVE_MF_BT3", "-DHAVE_MF_BT4"])
-    compiler.compile_executable(f"{output_dir}/lzmacomp.exe")
+    compiler.compile_executable(f"{output_dir}/lzmacompressor.exe")
