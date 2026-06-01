@@ -7,7 +7,7 @@ from scripts.build_config import BuildConfig
 from scripts.build_enums import Arch, Bitness, CompilerType, System
 from scripts.cli import cli
 from scripts.globals import DIST_DIR, MODULES_DIR
-from scripts.modules import brieflz, xz
+from scripts.modules import brieflz, lzma
 
 def main():
     print("Initiating Quarkit Building...")
@@ -16,14 +16,14 @@ def main():
     host_system: System = System.UNKNOWN
     if(sys.platform.startswith("win")): host_system = System.WINDOWS
     elif(sys.platform.startswith("linux")): host_system = System.LINUX
-    configs = [BuildConfig(CompilerType.CLANG, System.WINDOWS, Arch.x86, Bitness.x32, host_system),
-               BuildConfig(CompilerType.CLANG, System.WINDOWS, Arch.x86, Bitness.x64, host_system),
+    configs = [BuildConfig(CompilerType.CLANG, System.WINDOWS, Arch.x86, Bitness.x64, host_system),
+               BuildConfig(CompilerType.CLANG, System.WINDOWS, Arch.x86, Bitness.x32, host_system),
                BuildConfig(CompilerType.CLANG, System.WINDOWS, Arch.Arm, Bitness.x32, host_system),
                BuildConfig(CompilerType.CLANG, System.WINDOWS, Arch.Arm, Bitness.x64, host_system)]
     
     # First run to generate all the modules once
     for config in configs:
-        xz.build(config)
+        lzma.build(config)
         brieflz.build(config)
 
     # Build cli for each config and copy the modules

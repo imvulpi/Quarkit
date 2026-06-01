@@ -1,13 +1,6 @@
 #include "windows_glue.h"
 #include "quarkit_glue.h"
 
-#define NULL 0
-#define FILE_APPEND_DATA (0x0004)
-#define CREATE_ALWAYS 2
-#define FILE_ATTRIBUTE_NORMAL 0x00000080
-#define GENERIC_WRITE 0x40000000
-#define HEAP_ZERO_MEMORY 0x00000008
-
 __declspec(dllimport) extern void* __stdcall GetProcessHeap(void);
 __declspec(dllimport) extern void* __stdcall HeapAlloc(void* hHeap, unsigned long dwFlags, size_t dwBytes);
 __declspec(dllimport) extern void* __stdcall HeapReAlloc(void* hHeap, unsigned long dwFlags, void* lpMem, size_t dwBytes);

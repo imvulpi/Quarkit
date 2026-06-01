@@ -207,7 +207,7 @@ class ClangCompiler(Compiler):
 
         print(f"  Successfully created static library: {output_path}")
     
-    def compile_executable(self, output_path: str):
+    def compile_executable(self, output_path: str, link_flags: list[str] = []):
         config_folder = f"{self.config.get_triple()}"
         base_build_dir = os.path.join("build", config_folder)
         
@@ -246,7 +246,8 @@ class ClangCompiler(Compiler):
         print(f"  Compiled {len(self.objects)} files successfully.")
 
         link_cmd = (
-            [self.executable] 
+            [self.executable]
+            + link_flags
             + self.flags 
             + self.includes 
             + self.objects
