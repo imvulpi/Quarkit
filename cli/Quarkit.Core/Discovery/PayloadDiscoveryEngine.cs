@@ -60,7 +60,7 @@ namespace Quarkit.Core.Discovery
         /// <summary>
         /// Parses a potential RID string (e.g., "win-x64", "linux-arm") into a TargetKey.
         /// </summary>
-        public TargetKey? TryParseRid(string potentialRid)
+        public static TargetKey? TryParseRid(string potentialRid)
         {
             if (string.IsNullOrWhiteSpace(potentialRid)) return null;
             potentialRid = potentialRid.Trim().ToLower();
@@ -85,7 +85,7 @@ namespace Quarkit.Core.Discovery
         /// <summary>
         /// Introspects the local machine environment to auto-generate a native TargetKey baseline.
         /// </summary>
-        public TargetKey DiscoverHostTarget()
+        public static TargetKey DiscoverHostTarget()
         {
             OSSystem system = OSSystem.None;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) system = OSSystem.Windows;
