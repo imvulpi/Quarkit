@@ -1,6 +1,5 @@
 ﻿using Quarkit.CLI;
-using Quarkit.Models.Manifest;
-using System.Text.Json;
+using Quarkit.Core;
 
 internal class Program
 {
@@ -11,8 +10,20 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        QuarkitArgumentSettings settings = HandleArgs(args);
-        if (settings.ShouldContinue) return;
+        try
+        {
+            QuarkitArgumentSettings settings = HandleArgs(args);
+            if (!settings.ShouldContinue) return;
+
+            string workingDirectory = Directory.GetCurrentDirectory();
+            Console.WriteLine($"Checking for Quarkit in: \n{workingDirectory}\n");
+        
+            QuarkitOrchestrator quarkit = new();
+            quarkit.Build(Path.Combine(workingDirectory, "quarkit.json"));
+        }catch(Exception ex)
+        {
+            Console.WriteLine($"Error caught: {ex}");
+        }
     }
 
     static QuarkitArgumentSettings HandleArgs(string[] args)
