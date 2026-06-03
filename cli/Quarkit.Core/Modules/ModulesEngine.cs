@@ -143,6 +143,14 @@ namespace Quarkit.Core.Modules
                     throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
                 }
 
+                if (command.ShorthandOverrides != null)
+                {
+                    foreach (var overrides in command.ShorthandOverrides)
+                    {
+                        shorthandEngine.SetToken(overrides.Key, shorthandEngine.Expand(overrides.Value));
+                    }
+                }
+
                 if (command.CaptureVariables)
                 {
                     // TODO: This could use a bit more checking:
