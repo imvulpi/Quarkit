@@ -42,9 +42,12 @@ namespace Quarkit.Core.Build
             InjectCompilationOptions(args, parameters);
 
             var dynamicModuleInits = new List<string>();
+            var dynamicModuleExterns = new List<string>();
             foreach (var module in parameters.ActiveModules)
             {
+                if (module.Manifest.HasInitHook != null && module.Manifest.HasInitHook.Value == false) continue;
                 dynamicModuleInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();"); // TODO: might not exists, checking or manifest option.
+                dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_init(void);");
                 if (module.Manifest.CompilerFlags != null)
                 {
                     foreach (var flag in module.Manifest.CompilerFlags)
@@ -58,10 +61,11 @@ namespace Quarkit.Core.Build
             {
                 string joinedInits = string.Join(" ", dynamicModuleInits);
                 args.Add($"-DQUARKIT_MODULE_INITS=\"{joinedInits}\"");
+
+                string joinedExterns = string.Join(" ", dynamicModuleExterns);
+                args.Add($"-DQUARKIT_MODULE_EXTERNS=\"{joinedExterns}\"");
             }
 
-            // Core and module c source files.
-            args.Add($"\"{Path.Combine(parameters.QuarkitRoot, Paths.GetInstallerDir(parameters.Target.System), "main.c")}\"");
             foreach (var module in parameters.ActiveModules)
             {
                 foreach (var sourceFile in module.GetAbsoluteCSources())
