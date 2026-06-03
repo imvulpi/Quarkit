@@ -30,7 +30,8 @@ namespace Quarkit.Core.Build
 
             args.Add("-o");
             args.Add($"\"{parameters.OutputPath}\"");
-            args.Add($"-I\"{Path.Combine(Paths.GetInstallerIncludes(parameters.Target.System))}\"");
+            args.Add($"-I\"{Path.Combine(parameters.QuarkitRoot, Paths.GetInstallerIncludes(parameters.Target.System))}\"");
+            args.Add($"-I\"{Path.Combine(parameters.QuarkitRoot, Paths.GetSharedInstallerIncludes())}\"");
             foreach (var module in parameters.ActiveModules)
             {
                 string includePath = Path.Combine(module.ModuleDirectory, "include");
