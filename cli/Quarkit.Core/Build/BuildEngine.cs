@@ -15,6 +15,7 @@ namespace Quarkit.Core.Build
             _processRunner = processRunner;
         }
 
+        public const string ESC_STRING = "\"\\\"";
         public void Build(BuildParameters parameters)
         {
             string? outputFolder = Path.GetDirectoryName(parameters.OutputPath);
@@ -158,19 +159,19 @@ namespace Quarkit.Core.Build
             string bitness = parameters.Target.Bit.AsString();
 
             args.Add($"-DQUARKIT_BUILD_TIMESTAMP={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
-            args.Add($"-DQUARKIT_GENERATOR_VERSION=\"1.0.0-alpha.1\"");
+            args.Add($"-DQUARKIT_GENERATOR_VERSION={ESC_STRING}1.0.0-alpha.1{ESC_STRING}");
             args.Add($"-DQUARKIT_OS_{system}");
-            args.Add($"-DQUARKIT_OS_NAME=\"{system}\"");
+            args.Add($"-DQUARKIT_OS_NAME={ESC_STRING}{system}{ESC_STRING}");
             args.Add($"-DQUARKIT_ARCH_{architecture}");
             args.Add($"-DQUARKIT_ARCH_{architecture}_{bitness}");
-            args.Add($"-DQUARKIT_ARCH_NAME=\"{architecture}\"");
+            args.Add($"-DQUARKIT_ARCH_NAME={ESC_STRING}{architecture}{ESC_STRING}");
             args.Add($"-DQUARKIT_BITNESS_{bitness}");
-            args.Add($"-DQUARKIT_BITNESS_NAME=\"{bitness}\"");
+            args.Add($"-DQUARKIT_BITNESS_NAME={ESC_STRING}{bitness}{ESC_STRING}");
 
             var options = parameters.ResolvedOptions;
             if (options.AdminRequired.HasValue && options.AdminRequired.Value) args.Add($"-DQUARKIT_REQUIRE_ADMIN");
-            if (!string.IsNullOrEmpty(options.AppName)) args.Add($"-DQUARKIT_APP_NAME=\"{options.AppName}\"");
-            if (!string.IsNullOrEmpty(options.TargetPath)) args.Add($"-DQUARKIT_TARGET_PATH=\"{options.TargetPath}\"");
+            if (!string.IsNullOrEmpty(options.AppName)) args.Add($"-DQUARKIT_APP_NAME={ESC_STRING}{options.AppName}{ESC_STRING}");
+            if (!string.IsNullOrEmpty(options.TargetPath)) args.Add($"-DQUARKIT_TARGET_PATH={ESC_STRING}{options.TargetPath}{ESC_STRING}");
             if (options.DesktopShortcut.HasValue && options.DesktopShortcut.Value)
                 args.Add("-DQUARKIT_CREATE_DESKTOP_SHORTCUT");
 
@@ -180,7 +181,7 @@ namespace Quarkit.Core.Build
             if (!string.IsNullOrEmpty(options.ExecutableToLaunch))
             {
                 args.Add("-DQUARKIT_HAS_LAUNCH_TARGET");
-                args.Add($"-DQUARKIT_EXE_LAUNCH=\"{options.ExecutableToLaunch}\"");
+                args.Add($"-DQUARKIT_EXE_LAUNCH={ESC_STRING}{options.ExecutableToLaunch}{ESC_STRING}");
             }
         }
     }
