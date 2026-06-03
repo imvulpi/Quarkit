@@ -46,7 +46,7 @@ namespace Quarkit.Core.Shorthand
         public void SetToken(string key, string value)
         {
             string normalizedKey = key.StartsWith(OPENING_TAG) && key.EndsWith(CLOSING_TAG) ? key : $"{OPENING_TAG}{key}{CLOSING_TAG}";
-            tokensAndValues.Add(normalizedKey, value);
+            tokensAndValues[normalizedKey] = value; // Overwrites or sets
         }
        
         /// <summary>
