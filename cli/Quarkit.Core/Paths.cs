@@ -21,5 +21,10 @@ namespace Quarkit.Core
         {
             return Path.Join(INSTALLERS_ROOT_DIR, system.AsString(), "include");
         }
+
+        public static string GetSharedInstallerIncludes()
+        {
+            return Path.Join(INSTALLERS_ROOT_DIR, "shared", "include");
+        }
     }
 }
