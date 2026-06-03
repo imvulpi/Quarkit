@@ -92,6 +92,7 @@ public class BuildEngineTests
                 new()
                 {
                     ModuleDirectory = "C:/Quarkit/modules/brieflz",
+                    ManifestPath = "C:/Quarkit/modules/brieflz/manifest.json",
                     Manifest = new ModuleManifest
                     {
                         Id = "brieflz",
@@ -133,6 +134,7 @@ public class BuildEngineTests
         var moduleA = new LoadedModule
         {
             ModuleDirectory = "C:/Quarkit/modules/logger",
+            ManifestPath = "C:/Quarkit/modules/logger/manifest.json",
             Manifest = new ModuleManifest
             {
                 Id = "custom-logger",
@@ -144,6 +146,7 @@ public class BuildEngineTests
         var moduleB = new LoadedModule
         {
             ModuleDirectory = "C:/Quarkit/modules/brieflz",
+            ManifestPath = "C:/Quarkit/modules/logger/manifest.json",
             Manifest = new ModuleManifest
             {
                 Id = "brieflz",

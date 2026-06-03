@@ -52,6 +52,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/UserProject/modules/my-scraper",
+            ManifestPath = "C:/UserProject/modules/my-scraper/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "my-scraper",
@@ -130,6 +131,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/Project/modules/local-tool",
+            ManifestPath = "C:/Project/modules/local-tool/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "local-tool",
@@ -157,6 +159,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/Project/modules/local-tool",
+            ManifestPath = "C:/Project/modules/local-tool/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "local-tool",
@@ -183,6 +186,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/Project/modules/local-tool",
+            ManifestPath = "C:/Project/modules/local-tool/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "local-tool",
@@ -212,6 +216,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/Project/modules/broken",
+            ManifestPath = "C:/Project/modules/broken/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "broken-module",
@@ -242,6 +247,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/Project/modules/regular",
+            ManifestPath = "C:/Project/modules/regular/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "regular-module",
@@ -271,6 +277,7 @@ public class ModulesEngineTests
         var loadedModule = new LoadedModule
         {
             ModuleDirectory = "C:/Project/modules/stderr-fail",
+            ManifestPath = "C:/Project/modules/stderr-fail/module.json",
             Manifest = new ModuleManifest
             {
                 Id = "stderr-fail-module",
