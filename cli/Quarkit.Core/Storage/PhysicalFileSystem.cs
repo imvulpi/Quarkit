@@ -64,4 +64,19 @@ public class PhysicalFileSystem : IFileSystem
     {
         return File.Open(path, mode);
     }
+
+    public byte[] ReadAllBytes(string path)
+    {
+        return File.ReadAllBytes(path);
+    }
+
+    public IEnumerable<string> ReadLines(string path)
+    {
+        return File.ReadLines(path);
+    }
+
+    public void AppendAllBytes(string path, byte[] data)
+    {
+        File.AppendAllBytes(path, data);
+    }
 }

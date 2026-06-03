@@ -103,6 +103,7 @@ public class BuildEngineTests
                 }
             }
         };
+        fileSystem.WriteAllText("C:/Quarkit/modules/brieflz/src/brieflz.c", "// This is a module test.");
 
         engine.Build(parameters);
 
@@ -110,7 +111,7 @@ public class BuildEngineTests
 
         // Verify Hardware Profile Macros
         await Assert.That(args).Contains("-DQUARKIT_OS_WINDOWS");
-        await Assert.That(args).Contains("-DQUARKIT_OS_NAME=\"WINDOWS\"");
+        await Assert.That(args).Contains($"-DQUARKIT_OS_NAME={BuildEngine.ESC_STRING}WINDOWS{BuildEngine.ESC_STRING}");
         await Assert.That(args).Contains("-DQUARKIT_ARCH_X86");
         await Assert.That(args).Contains("-DQUARKIT_ARCH_X86_64");
         await Assert.That(args).Contains("-DQUARKIT_BITNESS_64");
@@ -118,10 +119,10 @@ public class BuildEngineTests
         // Verify Feature Macros
         await Assert.That(args).Contains("-DQUARKIT_REQUIRE_ADMIN");
         await Assert.That(args).Contains("-DQUARKIT_CREATE_DESKTOP_SHORTCUT");
-        await Assert.That(args).Contains("-DQUARKIT_APP_NAME=\"TestSuiteApp\"");
+        await Assert.That(args).Contains($"-DQUARKIT_APP_NAME={BuildEngine.ESC_STRING}TestSuiteApp{BuildEngine.ESC_STRING}");
         await Assert.That(args).Contains("-DQUARKIT_HAS_LAUNCH_TARGET");
-        await Assert.That(args).Contains("-DQUARKIT_EXE_LAUNCH=\"app.exe\"");
-        await Assert.That(args).Contains("-DQUARKIT_GENERATOR_VERSION=\"1.0.0-alpha.1\"");
+        await Assert.That(args).Contains($"-DQUARKIT_EXE_LAUNCH={BuildEngine.ESC_STRING}app.exe{BuildEngine.ESC_STRING}");
+        await Assert.That(args).Contains($"-DQUARKIT_GENERATOR_VERSION={BuildEngine.ESC_STRING}1.0.0-alpha.1{BuildEngine.ESC_STRING}");
     }
 
     [Test]
@@ -143,6 +144,8 @@ public class BuildEngineTests
             }
         };
 
+        fileSystem.WriteAllText("C:/Quarkit/modules/logger/src/log_core.c", "void quarkit_custom_logger_init() { // mock test }");
+
         var moduleB = new LoadedModule
         {
             ModuleDirectory = "C:/Quarkit/modules/brieflz",
@@ -155,6 +158,9 @@ public class BuildEngineTests
                 CompilerFlags = new List<string> { "-DBRIEFLZ_MAX_LEVEL=5" }
             }
         };
+
+        fileSystem.WriteAllText("C:/Quarkit/modules/brieflz/src/lz.c", "void quarkit_brieflz_init() { // mock test }");
+
 
         var parameters = new BuildParameters
         {

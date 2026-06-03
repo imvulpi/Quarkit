@@ -2,7 +2,6 @@
 using Quarkit.Core.Storage;
 using Quarkit.Models.Manifest;
 using Quarkit.Models.Manifest.Modules;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Quarkit.Core.Build
 {
@@ -42,7 +41,7 @@ namespace Quarkit.Core.Build
             }
 
             InjectCompilationOptions(args, parameters);
-            if (parameters.PayloadPath != string.Empty && File.Exists(parameters.PayloadPath))
+            if (parameters.PayloadPath != string.Empty && _fileSystem.FileExists(parameters.PayloadPath))
             {
                 FileInfo info = new(parameters.PayloadPath);
                 args.Add($"-DQUARKIT_PAYLOAD_SIZE={info.Length}"); // Payload size. (This doesn't change).
@@ -109,10 +108,10 @@ namespace Quarkit.Core.Build
             }
             else
             {
-                if (parameters.PayloadPath != string.Empty && File.Exists(parameters.PayloadPath))
+                if (parameters.PayloadPath != string.Empty && _fileSystem.FileExists(parameters.PayloadPath))
                 {
                     // Appends the payload to the executable
-                    File.AppendAllBytes(parameters.OutputPath, File.ReadAllBytes(parameters.PayloadPath));
+                    _fileSystem.AppendAllBytes(parameters.OutputPath, _fileSystem.ReadAllBytes(parameters.PayloadPath));
                 }
             }
         }
@@ -152,7 +151,7 @@ namespace Quarkit.Core.Build
                 if (module.Manifest.CSources == null || module.Manifest.CSources.Count <= 0) return false;
 
                 // Very simple check inside the first file
-                foreach (string line in File.ReadLines(module.Manifest.CSources[0]))
+                foreach (string line in _fileSystem.ReadLines(module.GetAbsoluteCSources().First()))
                 {
                     if(line.Contains("void") && line.Contains("quarkit") && line.Contains(hookName))
                     {

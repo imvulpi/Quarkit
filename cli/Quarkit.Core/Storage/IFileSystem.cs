@@ -21,9 +21,24 @@ public interface IFileSystem
     string ReadAllText(string path);
 
     /// <summary>
+    /// Synchronously reads the content of the file at the specified path into a byte array.
+    /// </summary>
+    byte[] ReadAllBytes(string path);
+
+    /// <summary>
+    /// Reads the lines of a file.
+    /// </summary>
+    IEnumerable<string> ReadLines(string path);
+
+    /// <summary>
     /// Asynchronously writes the specified byte string to a file at the specified path.
     /// </summary>
     void WriteAllText(string path, string data);
+
+    /// <summary>
+    /// Asynchronously appends bytes to the end of a file at the specified path.
+    /// </summary>
+    void AppendAllBytes(string path, byte[] data);
 
     /// <summary>
     /// Checks if a file exists at the specified path.

@@ -159,4 +159,24 @@ public class MockFileSystem : IFileSystem
         }
         return memStream;
     }
+
+    public byte[] ReadAllBytes(string path)
+    {
+        return Encoding.UTF8.GetBytes(ReadAllText(path));
+    }
+
+    public IEnumerable<string> ReadLines(string path)
+    {
+        var line = ReadAllText(path);
+        return line.Split(["\n", "\r\n"], StringSplitOptions.None).AsEnumerable();
+    }
+
+    public void AppendAllBytes(string path, byte[] data)
+    {
+        byte[] existingBytes = ReadAllBytes(path);
+        byte[] newBytes = new byte[existingBytes.Length + data.Length];
+        Array.Copy(existingBytes, newBytes, 0);
+        Array.Copy(data, 0, newBytes, existingBytes.Length, data.Length);
+        WriteAllText(path, Encoding.UTF8.GetString(newBytes));
+    }
 }
