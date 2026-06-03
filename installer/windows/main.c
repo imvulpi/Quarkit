@@ -18,7 +18,13 @@
 #define QUARKIT_MODULE_INITS
 #endif
 
-__declspec(dllimport) void ExitProcess(unsigned int code);
+#ifndef QUARKIT_MODULE_EXTERNS
+#define QUARKIT_MODULE_EXTERNS
+#endif
+
+QUARKIT_MODULE_EXTERNS
+
+__declspec(dllimport) void __stdcall ExitProcess(unsigned int code);
 
 /// @brief Method that invokes module functions.
 int mainCRTStartup(){  
