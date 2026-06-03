@@ -35,6 +35,13 @@ namespace Quarkit.Core.Shorthand
 
         public readonly Dictionary<string, string> tokensAndValues = new(StringComparer.OrdinalIgnoreCase);
 
+        public ShorthandEngine() { }
+
+        public ShorthandEngine(ShorthandEngine engine)
+        {
+            tokensAndValues = new(engine.tokensAndValues);
+        }
+
         /// <summary>
         /// Sets a token and the value related to it.
         /// </summary>
