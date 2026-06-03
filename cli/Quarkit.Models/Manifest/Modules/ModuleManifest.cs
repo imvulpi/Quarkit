@@ -19,5 +19,6 @@
         public List<int>? SuccessCodes { get; set; }
         public bool? FailOnStdErr { get; set; }
         public string? FailIfOutputContains { get; set; }
+        public Dictionary<string, string>? ShorthandOverrides { get; set; }
     }
 }
