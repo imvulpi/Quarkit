@@ -2,6 +2,7 @@
 using Quarkit.Core.Storage;
 using Quarkit.Models.Manifest;
 using Quarkit.Models.Manifest.Modules;
+using System.Xml;
 
 namespace Quarkit.Core.Build
 {
@@ -59,12 +60,14 @@ namespace Quarkit.Core.Build
             {
                 if (HasHook(module, module.Manifest.HasInitHook, "init"))
                 {
+                    Console.WriteLine($"Found a init hook: {$"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();"}");
                     dynamicModuleInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();");
                     dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_init(void);");
                 }
 
                 if (HasHook(module, module.Manifest.HasDeInitHook, "deinit"))
                 {
+                    Console.WriteLine($"Found a deinit hook: {$"quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit();"}");
                     dynamicModuleDeInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit();");
                     dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit(void);");
                 }
@@ -84,7 +87,7 @@ namespace Quarkit.Core.Build
                 args.Add($"-DQUARKIT_MODULE_INITS=\"{joinedInits}\"");
 
                 string joinedDeInits = string.Join(" ", dynamicModuleDeInits);
-                args.Add($"-DQUARKIT_MODULE_INITS=\"{joinedDeInits}\"");
+                args.Add($"-DQUARKIT_MODULE_DEINITS=\"{joinedDeInits}\"");
 
                 string joinedExterns = string.Join(" ", dynamicModuleExterns);
                 args.Add($"-DQUARKIT_MODULE_EXTERNS=\"{joinedExterns}\"");
@@ -114,6 +117,7 @@ namespace Quarkit.Core.Build
                     _fileSystem.AppendAllBytes(parameters.OutputPath, _fileSystem.ReadAllBytes(parameters.PayloadPath));
                 }
             }
+            Console.WriteLine();
         }
 
         private void ApplyTargetFlags(List<string> args, BuildParameters parameters)
