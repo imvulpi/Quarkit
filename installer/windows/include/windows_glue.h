@@ -19,3 +19,12 @@ typedef const char* LPCSTR;
 #define FILE_ATTRIBUTE_NORMAL 0x00000080
 #define GENERIC_WRITE 0x40000000
 #define HEAP_ZERO_MEMORY 0x00000008
+
+// Struct for retrieving 64-bit file sizes
+typedef union _LARGE_INTEGER {
+    struct {
+        DWORD LowPart;
+        long HighPart;
+    } DUMMYSTRUCTNAME;
+    __INT64_TYPE__ QuadPart;
+} LARGE_INTEGER;
