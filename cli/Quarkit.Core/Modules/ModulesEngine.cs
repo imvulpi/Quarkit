@@ -106,7 +106,6 @@ namespace Quarkit.Core.Modules
                 var contextTokens = new Dictionary<string, string>
                 {
                     { "<ModuleDir>", loadedModule.ModuleDirectory },
-                    { "<QK>", _qkRoot }
                 };
 
                 string executable = executable = shorthandEngine.Expand(command.Executable, contextTokens);
@@ -131,17 +130,17 @@ namespace Quarkit.Core.Modules
                 command.SuccessCodes ??= [0]; // Default success code
                 if (!command.SuccessCodes.Contains(exitCode))
                 {
-                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{command.Executable} {command.Arguments}` and it failed with: {exitCode} exit code.\nStandardError output: {error}");
+                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}` and it failed with: {exitCode} exit code.\nStandardError output: {error}");
                 }
 
                 if(command.FailIfOutputContains != null && (output.Contains(command.FailIfOutputContains) || error.Contains(command.FailIfOutputContains)))
                 {
-                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{command.Executable} {command.Arguments}`, and the output contains {command.FailIfOutputContains} which signifies failure.\nStandardError output: {error}");
+                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}`, and the output contains {command.FailIfOutputContains} which signifies failure.\nStandardError output: {error}");
                 }
 
                 if(command.FailOnStdErr != null && command.FailOnStdErr.Value && error != string.Empty)
                 {
-                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{command.Executable} {command.Arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
+                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
                 }
 
                 if (command.CaptureVariables)
