@@ -40,6 +40,16 @@ namespace Quarkit.Core.Build
             }
 
             InjectCompilationOptions(args, parameters);
+            if (parameters.PayloadPath != string.Empty && File.Exists(parameters.PayloadPath))
+            {
+                FileInfo info = new(parameters.PayloadPath);
+                args.Add($"-DQUARKIT_PAYLOAD_SIZE={info.Length}"); // Payload size. (This doesn't change).
+                args.Add($"-DQUARKIT_PAYLOAD_NAME={ESC_STRING}{parameters.PayloadName}{ESC_STRING}");
+            }
+            else
+            {
+                Console.WriteLine($"Payload is not a file! {parameters.PayloadPath}\n");
+            }
 
             var dynamicModuleInits = new List<string>();
             var dynamicModuleExterns = new List<string>();
@@ -81,6 +91,14 @@ namespace Quarkit.Core.Build
             if (result.ExitCode != 0)
             {
                 throw new Exception($"Compilation failed via toolchain '{parameters.CompilerName}'.\nError Details: {result.Error}");
+            }
+            else
+            {
+                if (parameters.PayloadPath != string.Empty && File.Exists(parameters.PayloadPath))
+                {
+                    // Appends the payload to the executable
+                    File.AppendAllBytes(parameters.OutputPath, File.ReadAllBytes(parameters.PayloadPath));
+                }
             }
         }
 
