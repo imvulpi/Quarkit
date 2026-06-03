@@ -4,7 +4,8 @@
     {
         public required string Id { get; set; } 
         public required string Version { get; set; }
-        public bool? HasInitHook { get; set; } 
+        public bool? HasInitHook { get; set; }
+        public bool? HasDeInitHook { get; set; }
         public List<string>? Dependencies { get; set; }
         public List<string>? CSources { get; set; }
         public List<string>? CompilerFlags { get; set; }

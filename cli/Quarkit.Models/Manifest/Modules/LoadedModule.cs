@@ -13,6 +13,11 @@ public class LoadedModule
     public required string ModuleDirectory { get; init; }
 
     /// <summary>
+    /// The absolute path to this module's manifest file on the developer's machine.
+    /// </summary>
+    public required string ManifestPath { get; init; }
+
+    /// <summary>
     /// Returns absolute file paths to all C sources so the BuildEngine can read them directly.
     /// </summary>
     public IEnumerable<string> GetAbsoluteCSources()

@@ -1,6 +1,8 @@
 ﻿using Quarkit.Core.Processes;
 using Quarkit.Core.Storage;
 using Quarkit.Models.Manifest;
+using Quarkit.Models.Manifest.Modules;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Quarkit.Core.Build
 {
@@ -52,12 +54,22 @@ namespace Quarkit.Core.Build
             }
 
             var dynamicModuleInits = new List<string>();
+            var dynamicModuleDeInits = new List<string>();
             var dynamicModuleExterns = new List<string>();
             foreach (var module in parameters.ActiveModules)
             {
-                if (module.Manifest.HasInitHook != null && module.Manifest.HasInitHook.Value == false) continue;
-                dynamicModuleInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();"); // TODO: might not exists, checking or manifest option.
-                dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_init(void);");
+                if (HasHook(module, module.Manifest.HasInitHook, "init"))
+                {
+                    dynamicModuleInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();");
+                    dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_init(void);");
+                }
+
+                if (HasHook(module, module.Manifest.HasDeInitHook, "deinit"))
+                {
+                    dynamicModuleDeInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit();");
+                    dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit(void);");
+                }
+
                 if (module.Manifest.CompilerFlags != null)
                 {
                     foreach (var flag in module.Manifest.CompilerFlags)
@@ -71,6 +83,9 @@ namespace Quarkit.Core.Build
             {
                 string joinedInits = string.Join(" ", dynamicModuleInits);
                 args.Add($"-DQUARKIT_MODULE_INITS=\"{joinedInits}\"");
+
+                string joinedDeInits = string.Join(" ", dynamicModuleDeInits);
+                args.Add($"-DQUARKIT_MODULE_INITS=\"{joinedDeInits}\"");
 
                 string joinedExterns = string.Join(" ", dynamicModuleExterns);
                 args.Add($"-DQUARKIT_MODULE_EXTERNS=\"{joinedExterns}\"");
@@ -130,6 +145,43 @@ namespace Quarkit.Core.Build
             }
         }
 
+        private bool HasHook(LoadedModule module, bool? hookOption, string hookName)
+        {
+            if (hookOption == null)
+            {
+                if (module.Manifest.CSources == null || module.Manifest.CSources.Count <= 0) return false;
+
+                // Very simple check inside the first file
+                foreach (string line in File.ReadLines(module.Manifest.CSources[0]))
+                {
+                    if(line.Contains("void") && line.Contains("quarkit") && line.Contains(hookName))
+                    {
+                        bool previousWasComment = false;
+                        for (int i = 0; i < line.Length; i++)
+                        {
+                            var current = line[i];
+                            
+                            // Very simple check for comment.
+                            if (previousWasComment && (current == '/' || current == '*')) return false;
+                            
+                            if (current == '/') previousWasComment = true;
+                            else if (current == 'v') return true; // beginning of 'void'
+                        }
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                if (hookOption == true) return true;
+                if (hookOption == false) return false;
+            }
+            
+            return false;
+        }
 
         private string GetGccTargetWindows(Architecture targetArch, Bitness targetBitness) {
             if (targetArch == Architecture.x86 && targetBitness == Bitness.x64) return "x86_64-w64-mingw32-gcc";

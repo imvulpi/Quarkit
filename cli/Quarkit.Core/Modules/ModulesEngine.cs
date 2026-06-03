@@ -89,6 +89,7 @@ namespace Quarkit.Core.Modules
             return new LoadedModule
             {
                 Manifest = manifest,
+                ManifestPath = manifestFilePath,
                 ModuleDirectory = resolvedPath
             };
         }
