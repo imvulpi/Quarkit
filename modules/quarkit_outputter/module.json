@@ -1,0 +1,12 @@
+{
+  "Id": "quarkit_outputter",
+  "Version": "1.0.0",
+  "Dependencies": [],
+  "CSources": [
+    "quarkit_outputter.c"
+  ],
+  "CompilerFlags": [
+    "-DQUARKIT_QUARKIT_OUTPUTTER_MODULE",
+    "-DQUARKIT_OUTPUTTER_MODULE"
+  ]
+}
