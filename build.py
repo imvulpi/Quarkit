@@ -34,9 +34,9 @@ def main():
         cli.build(config)
         dist_modules = f"{DIST_DIR}/{config.get_triple()}/modules"
         shutil.copytree(MODULES_DIR, dist_modules, dirs_exist_ok=True)
+        shutil.copytree("installer", f"output/{config.get_triple()}/installer", dirs_exist_ok=True)
 
     shutil.rmtree(MODULES_DIR)
-    shutil.copytree("installer", f"output/{config.get_triple()}/installer")
     
 if __name__ == "__main__":
     main()
