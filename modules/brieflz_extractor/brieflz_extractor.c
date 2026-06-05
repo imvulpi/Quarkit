@@ -64,7 +64,7 @@ __declspec(dllimport) WIN_BOOL __stdcall CloseHandle(HANDLE handle);
 #endif
 
 /// @brief Extracts and decompresses the data to the specified file.
-void quarkit_QkBrieflzExtractor_init(){
+void quarkit_brieflz_extractor_init(){
     const unsigned char* payload_start = g_quarkit_payload.data;
     const unsigned char* payload_end = g_quarkit_payload.data + g_quarkit_payload.size;
 

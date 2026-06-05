@@ -1,10 +1,12 @@
 {
   "Id": "QkRESERVED_WindowsCore",
   "Version": "1.0.0",
-  "HasInitHook": false,
-  "Dependencies": [],
-  "CSources": [
-    "./main.c"
-  ],
-  "CompilerFlags": [ "-lkernel32" ]
+  "Default": {
+    "HasInitHook": false,
+    "Dependencies": [],
+    "CSources": [
+      "./main.c"
+    ],
+    "CompilerFlags": [ "-lkernel32" ]
+  }
 }

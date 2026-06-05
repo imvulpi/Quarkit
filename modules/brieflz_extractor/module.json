@@ -1,0 +1,24 @@
+{
+  "Id": "brieflz_extractor",
+  "Version": "1.0.0",
+  "Default": {
+    "CSources": [
+      "brieflz_extractor.c",
+      "deps/depack.c"
+    ],
+    "CompilerFlags": [
+      "-DQUARKIT_BRIEFLZ_EXTRACTOR_MODULE"
+    ],
+    "Dependencies": [],
+    "PreBuildCommands": [
+      {
+        "Executable": "./<QkHostTriple>/blzpack.exe",
+        "Arguments": "-9 <PayloadPath> <ScratchPath>/<PayloadName>.blz",
+        "CaptureVariables": false,
+        "ShorthandOverrides":{
+          "<PayloadPath>": "<ScratchPath>/<PayloadName>.blz"
+        }
+      }
+    ]
+  }
+}

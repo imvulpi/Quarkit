@@ -1,0 +1,13 @@
+{
+  "Id": "quarkit_extraction",
+  "Version": "1.0.0",
+  "Default": {
+    "CSources": [
+      "src/quarkit_extraction.c"
+    ],
+    "CompilerFlags": [
+      "-DQUARKIT_EXTRACTION_MODULE",
+      "-DQUARKIT_QUARKIT_EXTRACTION_MODULE"
+    ]
+  }
+}

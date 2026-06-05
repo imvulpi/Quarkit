@@ -7,7 +7,7 @@ def build(config: BuildConfig):
     # Place modules that need to simply be copied.
     modules = [
         "quarkit_outputter",
-        "quarkit-extraction"
+        "quarkit_extraction"
     ]
     
     for module in modules:
