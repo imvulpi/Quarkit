@@ -1,26 +1,13 @@
-﻿namespace Quarkit.Models.Manifest.Modules
+﻿using Quarkit.Models.Core;
+
+namespace Quarkit.Models.Manifest.Modules
 {
     public class ModuleManifest
     {
         public required string Id { get; set; } 
         public required string Version { get; set; }
-        public bool? HasInitHook { get; set; }
-        public bool? HasDeInitHook { get; set; }
-        public List<string>? Dependencies { get; set; }
-        public List<string>? CSources { get; set; }
-        public List<string>? CompilerFlags { get; set; }
-        public List<string>? RequiredShorthands { get; set; }
-        public List<ModuleCommand>? PreBuildCommands { get; set; }
-    }
-
-    public class ModuleCommand
-    {
-        public required string Executable { get; set; }
-        public string? Arguments { get; set; }
-        public bool CaptureVariables { get; set; }
-        public List<int>? SuccessCodes { get; set; }
-        public bool? FailOnStdErr { get; set; }
-        public string? FailIfOutputContains { get; set; }
-        public Dictionary<string, string>? ShorthandOverrides { get; set; }
+        public List<QkOptionDefinition>? Options { get; set; }
+        public ModuleBlueprint Default { get; set; } = new();
+        public List<ModuleBlueprintOverride>? Overrides { get; set; }
     }
 }
