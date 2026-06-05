@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using Quarkit.Models.Manifest.Modules;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -7,6 +8,12 @@ namespace Quarkit.CLI;
 public static class ModuleWizard
 {
     public const string MODULE_FILENAME = "module.json";
+    private static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
 
     public static void Run()
     {
@@ -42,7 +49,7 @@ public static class ModuleWizard
 
         List<string>? cSources = null;
         List<string>? compilerFlags = null;
-        List<object>? preBuildCommands = null;
+        List<ModuleCommand>? preBuildCommands = null;
 
         if (typeChoice == "1" || typeChoice == "3") // Pure or Hybrid
         {
@@ -50,9 +57,9 @@ public static class ModuleWizard
             string scriptLang = Prompt("What script/executable will this run? (e.g., python, bash, node)", "python");
             string scriptFile = Prompt("Enter the script file name", scriptLang == "python" ? $"run_{moduleId.Replace("-", "_")}.py" : $"run_{moduleId.Replace("-", "_")}.sh");
 
-            preBuildCommands = new List<object>
+            preBuildCommands = new List<ModuleCommand>()
             {
-                new
+                new ModuleCommand()
                 {
                     Executable = scriptLang,
                     Arguments = $"{scriptFile} --dir <ModuleDir> --payload <PayloadDir>",
@@ -86,26 +93,22 @@ public static class ModuleWizard
             File.WriteAllText(fullCPath, $"void quarkit_{moduleId.Replace("-", "_")}_init() {{\n    // Your module logic here \n}}\n");
         }
 
-        var moduleManifest = new
+        ModuleManifest moduleManifest = new()
         {
             Id = moduleId,
             Version = "1.0.0",
-            Dependencies = new List<string>(),
-            CSources = cSources,
-            CompilerFlags = compilerFlags,
-            PreBuildCommands = preBuildCommands
+            Default = {
+                Dependencies = new List<string>(),
+                CSources = new(cSources),
+                CompilerFlags = new(compilerFlags),
+                PreBuildCommands = preBuildCommands
+            }
         };
 
         Directory.CreateDirectory(moduleId);
         string manifestPath = Path.Combine(moduleId, MODULE_FILENAME);
 
-        JsonSerializerOptions options = new() { 
-            WriteIndented = true, 
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping  
-        };
-
-        string jsonString = JsonSerializer.Serialize(moduleManifest, options);
+        string jsonString = JsonSerializer.Serialize(moduleManifest, jsonOptions);
         File.WriteAllText(manifestPath, jsonString);
 
         Console.ForegroundColor = ConsoleColor.Green;

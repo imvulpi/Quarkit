@@ -35,9 +35,9 @@ namespace Quarkit.Core.Build
             args.Add($"\"{parameters.OutputPath}\"");
             args.Add($"-I\"{Path.Combine(parameters.QuarkitRoot, Paths.GetInstallerIncludes(parameters.Target.System))}\"");
             args.Add($"-I\"{Path.Combine(parameters.QuarkitRoot, Paths.GetSharedInstallerIncludes())}\"");
-            foreach (var module in parameters.ActiveModules)
+            foreach (var resolved in parameters.ResolvedModules)
             {
-                string includePath = Path.Combine(module.ModuleDirectory, "include");
+                string includePath = Path.Combine(resolved.Module.ModuleDirectory, "include");
                 args.Add($"-I\"{includePath}\"");
             }
 
@@ -56,25 +56,25 @@ namespace Quarkit.Core.Build
             var dynamicModuleInits = new List<string>();
             var dynamicModuleDeInits = new List<string>();
             var dynamicModuleExterns = new List<string>();
-            foreach (var module in parameters.ActiveModules)
+            foreach (var resolved in parameters.ResolvedModules)
             {
-                if (HasHook(module, module.Manifest.HasInitHook, "init"))
+                if (HasHook(resolved, resolved.Blueprint.HasInitHook, "init"))
                 {
-                    Console.WriteLine($"Found a init hook: {$"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();"}");
-                    dynamicModuleInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_init();");
-                    dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_init(void);");
+                    Console.WriteLine($"Found a init hook: {$"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_init();"}");
+                    dynamicModuleInits.Add($"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_init();");
+                    dynamicModuleExterns.Add($"extern void quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_init(void);");
                 }
 
-                if (HasHook(module, module.Manifest.HasDeInitHook, "deinit"))
+                if (HasHook(resolved, resolved.Blueprint.HasDeInitHook, "deinit"))
                 {
-                    Console.WriteLine($"Found a deinit hook: {$"quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit();"}");
-                    dynamicModuleDeInits.Add($"quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit();");
-                    dynamicModuleExterns.Add($"extern void quarkit_{module.Manifest.Id.Replace("-", "_")}_deinit(void);");
+                    Console.WriteLine($"Found a deinit hook: {$"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_deinit();"}");
+                    dynamicModuleDeInits.Add($"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_deinit();");
+                    dynamicModuleExterns.Add($"extern void quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_deinit(void);");
                 }
 
-                if (module.Manifest.CompilerFlags != null)
+                if (resolved.Blueprint.CompilerFlags?.Values != null)
                 {
-                    foreach (var flag in module.Manifest.CompilerFlags)
+                    foreach (var flag in resolved.Blueprint.CompilerFlags.Values)
                     {
                         args.Add(flag);
                     }
@@ -93,9 +93,9 @@ namespace Quarkit.Core.Build
                 args.Add($"-DQUARKIT_MODULE_EXTERNS=\"{joinedExterns}\"");
             }
 
-            foreach (var module in parameters.ActiveModules)
+            foreach (var resolved in parameters.ResolvedModules)
             {
-                foreach (var sourceFile in module.GetAbsoluteCSources())
+                foreach (var sourceFile in resolved.GetAbsoluteCSources())
                 {
                     args.Add($"\"{sourceFile}\"");
                 }
@@ -148,14 +148,14 @@ namespace Quarkit.Core.Build
             }
         }
 
-        private bool HasHook(LoadedModule module, bool? hookOption, string hookName)
+        private bool HasHook(ResolvedModule resolvedMod, bool? hookOption, string hookName)
         {
             if (hookOption == null)
             {
-                if (module.Manifest.CSources == null || module.Manifest.CSources.Count <= 0) return false;
+                if (resolvedMod.Blueprint.CSources == null || resolvedMod.Blueprint.CSources?.Values?.Count <= 0) return false;
 
                 // Very simple check inside the first file
-                foreach (string line in _fileSystem.ReadLines(module.GetAbsoluteCSources().First()))
+                foreach (string line in _fileSystem.ReadLines(resolvedMod.GetAbsoluteCSources().First()))
                 {
                     if(line.Contains("void") && line.Contains("quarkit") && line.Contains(hookName))
                     {

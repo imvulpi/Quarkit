@@ -1,6 +1,7 @@
 ﻿using Quarkit.Core.Build;
 using Quarkit.Core.Discovery;
 using Quarkit.Core.Installation;
+using Quarkit.Core.Manifest;
 using Quarkit.Core.Modules;
 using Quarkit.Core.Processes;
 using Quarkit.Core.Shorthand;
@@ -67,23 +68,45 @@ namespace Quarkit.Core
                 buildShorthandEngine.SetToken("<ScratchPath>", scratchDir);
                 Console.WriteLine($"Target: {payload.AbsolutePayloadPath}");
 
-                List<LoadedModule> modules = [];
+                List<LoadedModule> loadedModules = [];
                 string coreModuleDir = Path.Combine(quarkitRoot, Paths.GetInstallerDir(target.System));
-                modules.Add(modulesEngine.ResolveAndLoadModule("", coreModuleDir)); // Should be first.
+                loadedModules.Add(modulesEngine.FindAndLoadModule("", coreModuleDir)); // Should be first.
                 if (resolvedOptions.Modules != null) {
                     foreach (var module in resolvedOptions.Modules)
-                        modules.Add(modulesEngine.ResolveAndLoadModule(module, manifestDir));
+                        loadedModules.Add(modulesEngine.FindAndLoadModule(module, manifestDir));
                 }
 
-                // TODO: Add a feature into the shorthand engine so it can be cloned/duplicated and there can be
-                // custom shorthand values for each target like <QkTargetTriple> ...
+                List<ResolvedModule> resolvedModules = new List<ResolvedModule>(loadedModules.Count);
+                OverridesResolver resolver = new OverridesResolver();
+                foreach (LoadedModule module in loadedModules)
+                {
+                    if(module.Manifest.Overrides == null)
+                    {
+                        resolvedModules.Add(new()
+                        {
+                            Blueprint = module.Manifest.Default,
+                            Module = module,
+                        });
+                        continue;
+                    }
+                    ModuleBlueprint blueprint = resolver.ResolveForTarget(module.Manifest.Default, [.. module.Manifest.Overrides], target, module.Manifest.Options);
+                    resolvedModules.Add(new()
+                    {
+                        Blueprint = blueprint,
+                        Module = module,
+                    });
+                }
+
 
                 // Run commands that are marked as before build ones.
-                foreach (var module in modules) modulesEngine.RunPreBuildCommands(module, buildShorthandEngine);
+                foreach (var resolved in resolvedModules)
+                {
+                    modulesEngine.RunPreBuildCommands(resolved.Module, resolved.Blueprint, buildShorthandEngine);
+                }
 
                 buildEngine.Build(new()
                 {
-                    ActiveModules = modules,
+                    ResolvedModules = resolvedModules,
                     OutputPath = Path.Combine(manifestDir, manifest.OutputPath ?? DEFAULT_DISTRIBUTION_DIR, $"{target.GetTriple()}", $"{manifest.Default.AppName}_qkinstaller.exe"),
                     QuarkitRoot = quarkitRoot,
                     ResolvedOptions = resolvedOptions,

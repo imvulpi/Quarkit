@@ -44,7 +44,7 @@ namespace Quarkit.Core.Modules
         /// <summary>
         /// Resolve a module string from the installation options into a LoadedModule.
         /// </summary>
-        public LoadedModule ResolveAndLoadModule(string moduleDeclaration, string manifestDirectory)
+        public LoadedModule FindAndLoadModule(string moduleDeclaration, string manifestDirectory)
         {
             string? resolvedPath = null;
 
@@ -97,29 +97,29 @@ namespace Quarkit.Core.Modules
         /// <summary>
         /// Run the script commands and pipe stdout variables back to the ShorthandEngine.
         /// </summary>
-        public void RunPreBuildCommands(LoadedModule loadedModule, ShorthandEngine shorthandEngine)
+        public void RunPreBuildCommands(LoadedModule module, ModuleBlueprint blueprint, ShorthandEngine shorthandEngine)
         {
-            if (loadedModule.Manifest.PreBuildCommands == null) return;
+            if (blueprint.PreBuildCommands == null) return;
 
-            foreach (var command in loadedModule.Manifest.PreBuildCommands)
+            foreach (var command in blueprint.PreBuildCommands)
             {
                 // Context tokens specific to this command execution context
                 var contextTokens = new Dictionary<string, string>
                 {
-                    { "<ModuleDir>", loadedModule.ModuleDirectory },
+                    { "<ModuleDir>", module.ModuleDirectory },
                 };
 
                 string executable = executable = shorthandEngine.Expand(command.Executable, contextTokens);
                 if (!command.Executable.StartsWith("<QK>")) // No root
                 {
-                    string possibleExecutable = Path.Combine(loadedModule.ModuleDirectory, executable);
+                    string possibleExecutable = Path.Combine(module.ModuleDirectory, executable);
                     if (_fileSystem.FileExists(possibleExecutable)) // Prefer local executables.
                     {
                         executable = possibleExecutable;
                     }
                     else if (command.Executable.StartsWith("./") || command.Executable.StartsWith("./")) // Forced a local executable
                     {
-                        throw new InvalidDataException($"Module: {loadedModule.Manifest.Id} " +
+                        throw new InvalidDataException($"Module: {module.Manifest.Id} " +
                             $"tried to execute {command.Executable}, but there is no LOCAL {command.Executable}. Did you mean {command.Executable[2..]}?");
                     }
                 }  // Otherwise it may be a executable registered in Paths of the system so we dont do anything.
@@ -131,17 +131,17 @@ namespace Quarkit.Core.Modules
                 command.SuccessCodes ??= [0]; // Default success code
                 if (!command.SuccessCodes.Contains(exitCode))
                 {
-                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}` and it failed with: {exitCode} exit code.\nStandardError output: {error}");
+                    throw new Exception($"{module.Manifest.Id} module ran `{executable} {arguments}` and it failed with: {exitCode} exit code.\nStandardError output: {error}");
                 }
 
                 if(command.FailIfOutputContains != null && (output.Contains(command.FailIfOutputContains) || error.Contains(command.FailIfOutputContains)))
                 {
-                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}`, and the output contains {command.FailIfOutputContains} which signifies failure.\nStandardError output: {error}");
+                    throw new Exception($"{module.Manifest.Id} module ran `{executable} {arguments}`, and the output contains {command.FailIfOutputContains} which signifies failure.\nStandardError output: {error}");
                 }
 
                 if(command.FailOnStdErr != null && command.FailOnStdErr.Value && error != string.Empty)
                 {
-                    throw new Exception($"{loadedModule.Manifest.Id} module ran `{executable} {arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
+                    throw new Exception($"{module.Manifest.Id} module ran `{executable} {arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
                 }
 
                 if (command.ShorthandOverrides != null)

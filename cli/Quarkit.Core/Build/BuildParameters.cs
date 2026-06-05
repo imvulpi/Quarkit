@@ -19,6 +19,6 @@ namespace Quarkit.Core.Build
 
         // Direct domain engine objects
         public required InstallOptions ResolvedOptions { get; init; }
-        public required List<LoadedModule> ActiveModules { get; init; } = [];
+        public required List<ResolvedModule> ResolvedModules { get; init; } = [];
     }
 }

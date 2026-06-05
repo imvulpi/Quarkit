@@ -24,18 +24,21 @@ public class ModulesEngineTests
             {
                 Id = "brieflz",
                 Version = "1.2.3",
-                CSources = ["src/brieflz.c"]
+                Default = {
+                    CSources = new(["src/brieflz.c"])
+                }
             })
         );
 
         var engine = new ModulesEngine(qkRoot, mockFs, mockRunner);
-        var loadedModule = engine.ResolveAndLoadModule("brieflz", manifestDir);
+        var loadedModule = engine.FindAndLoadModule("brieflz", manifestDir);
 
         await Assert.That(loadedModule.Manifest.Id).IsEqualTo("brieflz");
         await Assert.That(loadedModule.Manifest.Version).IsEqualTo("1.2.3");
-        await Assert.That(loadedModule.Manifest.CSources).IsNotNull();
-        await Assert.That(loadedModule.Manifest.CSources?.Count).IsEqualTo(1);
-        await Assert.That(loadedModule.Manifest.CSources[0]).IsEqualTo("src/brieflz.c");
+        await Assert.That(loadedModule.Manifest.Default.CSources).IsNotNull();
+        await Assert.That(loadedModule.Manifest.Default.CSources.Values).IsNotNull();
+        await Assert.That(loadedModule.Manifest.Default.CSources.Values.Count).IsEqualTo(1);
+        await Assert.That(loadedModule.Manifest.Default.CSources.Values[0]).IsEqualTo("src/brieflz.c");
         await Assert.That(MockFileSystem.Normalize(loadedModule.ModuleDirectory)).IsEqualTo($"{qkRoot}/modules/brieflz");
     }
 
@@ -57,20 +60,22 @@ public class ModulesEngineTests
             {
                 Id = "my-scraper",
                 Version = "2.5.9-beta",
-                PreBuildCommands =
-                [
-                    new()
-                    {
-                        Executable = "python",
-                        Arguments = "script.py --target <PayloadDir>",
-                        CaptureVariables = true
-                    }
-                ]
+                Default = {
+                    PreBuildCommands =
+                    [
+                        new()
+                        {
+                            Executable = "python",
+                            Arguments = "script.py --target <PayloadDir>",
+                            CaptureVariables = true
+                        }
+                    ]
+                }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
-        engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
 
         await Assert.That(mockRunner.History.Count).EqualTo(1);
         await Assert.That(mockRunner.History[0].Filename).IsEqualTo("python");
@@ -91,7 +96,7 @@ public class ModulesEngineTests
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
 
-        var action = () => engine.ResolveAndLoadModule("./modules/bad-json", "C:/Project");
+        var action = () => engine.FindAndLoadModule("./modules/bad-json", "C:/Project");
         await Assert.That(action).Throws<JsonException>();
     }
 
@@ -107,7 +112,9 @@ public class ModulesEngineTests
                 new ModuleManifest() { 
                     Id = null, 
                     Version = null, 
-                    CSources = ["./src/bad-code.c"] 
+                    Default = {
+                       CSources = new(["./src/bad-code.c"])
+                    }
                 },
                 new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }
             )
@@ -116,7 +123,7 @@ public class ModulesEngineTests
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
 
-        var action = () => engine.ResolveAndLoadModule("./modules/bad-json", "C:/Project");
+        var action = () => engine.FindAndLoadModule("./modules/bad-json", "C:/Project");
         await Assert.That(action).Throws<JsonException>();
     }
 
@@ -136,15 +143,17 @@ public class ModulesEngineTests
             {
                 Id = "local-tool",
                 Version = "1.0.0",
-                PreBuildCommands =
-                [
-                    new() { Executable = "tools/compress.exe", Arguments = "--run" }
-                ]
+                Default = {
+                    PreBuildCommands =
+                    [
+                        new() { Executable = "tools/compress.exe", Arguments = "--run" }
+                    ]
+                }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
-        engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
         await Assert.That(MockFileSystem.Normalize(mockRunner.History[0].Filename)).IsEqualTo("C:/Project/modules/local-tool/tools/compress.exe");
     }
 
@@ -164,15 +173,17 @@ public class ModulesEngineTests
             {
                 Id = "local-tool",
                 Version = "1.0.0",
-                PreBuildCommands =
-                [
-                    new() { Executable = "<QK>/tools/compress.exe", Arguments = "--run" } // Explicit <QK> root
-                ]
+                Default = {
+                    PreBuildCommands =
+                    [
+                        new() { Executable = "<QK>/tools/compress.exe", Arguments = "--run" } // Explicit <QK> root
+                    ]
+                }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
-        engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
         await Assert.That(MockFileSystem.Normalize(mockRunner.History[0].Filename)).IsEqualTo("C:/QuarkitCore/tools/compress.exe");
     }
 
@@ -191,15 +202,17 @@ public class ModulesEngineTests
             {
                 Id = "local-tool",
                 Version = "1.0.0",
-                PreBuildCommands =
-                [
-                    new() { Executable = "./tools/compress.exe", Arguments = "--run" }
-                ]
+                Default = {
+                    PreBuildCommands =
+                    [
+                        new() { Executable = "./tools/compress.exe", Arguments = "--run" }
+                    ]
+                }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
-        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        var action = () => engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
         await Assert.That(action).Throws<InvalidDataException>();
     }
 
@@ -221,16 +234,18 @@ public class ModulesEngineTests
             {
                 Id = "broken-module",
                 Version = "1.0.0",
-                PreBuildCommands = new List<ModuleCommand>
-                {
-                    new() { Executable = "python", Arguments = "crash.py" }
+                Default = {
+                    PreBuildCommands = new List<ModuleCommand>
+                    {
+                        new() { Executable = "python", Arguments = "crash.py" }
+                    }
                 }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
 
-        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        var action = () => engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
         var exception = await Assert.That(action).Throws<Exception>();
         await Assert.That(exception?.Message).Contains("SyntaxError: invalid syntax at line 4");
     }
@@ -252,15 +267,17 @@ public class ModulesEngineTests
             {
                 Id = "regular-module",
                 Version = "1.0.0",
-                PreBuildCommands = new List<ModuleCommand>
-                {
-                    new() { Executable = "python", Arguments = "regular.py", SuccessCodes = [10] }
+                Default = {
+                    PreBuildCommands = new List<ModuleCommand>
+                    {
+                        new() { Executable = "python", Arguments = "regular.py", SuccessCodes = [10] }
+                    }
                 }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
-        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        var action = () => engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
 
         await Assert.That(action).ThrowsNothing();
     }
@@ -282,15 +299,17 @@ public class ModulesEngineTests
             {
                 Id = "stderr-fail-module",
                 Version = "1.0.0",
-                PreBuildCommands = new List<ModuleCommand>
-                {
-                    new() { Executable = "python", Arguments = "stderr-fail.py", FailIfOutputContains = "CRITICAL ERROR" }
+                Default = {
+                    PreBuildCommands = new List<ModuleCommand>
+                    {
+                        new() { Executable = "python", Arguments = "stderr-fail.py", FailIfOutputContains = "CRITICAL ERROR" }
+                    }
                 }
             }
         };
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
-        var action = () => engine.RunPreBuildCommands(loadedModule, shorthandEngine);
+        var action = () => engine.RunPreBuildCommands(loadedModule, loadedModule.Manifest.Default, shorthandEngine);
 
         await Assert.That(action).Throws<Exception>();
 

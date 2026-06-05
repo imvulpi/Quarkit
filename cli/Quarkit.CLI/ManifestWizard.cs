@@ -9,6 +9,12 @@
 
     public static class ManifestWizard
     {
+        private readonly static JsonSerializerOptions jsonOptions = new()
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
         public static void Run()
         {
             Console.Clear();
@@ -72,11 +78,7 @@
             };
 
             string fileName = "quarkit.json";
-            var options = new JsonSerializerOptions { 
-                WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-            string jsonString = JsonSerializer.Serialize(manifest, options);
+            string jsonString = JsonSerializer.Serialize(manifest, jsonOptions);
 
             File.WriteAllText(fileName, jsonString);
 

@@ -3,6 +3,8 @@ using Quarkit.Models.Manifest;
 using Quarkit.Models.Manifest.Modules;
 using Quarkit.Tests.Mocks;
 
+namespace Quarkit.Tests;
+
 public class BuildEngineTests
 {
     [Test]
@@ -20,7 +22,7 @@ public class BuildEngineTests
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
             ResolvedOptions = new InstallOptions(),
-            ActiveModules = new List<LoadedModule>()
+            ResolvedModules = []
         };
 
         engine.Build(parameters);
@@ -55,7 +57,7 @@ public class BuildEngineTests
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Linux, Architecture.Arm, Bitness.x32),
             ResolvedOptions = new InstallOptions(),
-            ActiveModules = new List<LoadedModule>()
+            ResolvedModules = []
         };
 
         engine.Build(parameters);
@@ -87,21 +89,24 @@ public class BuildEngineTests
                 DesktopShortcut = true,
                 ExecutableToLaunch = "app.exe"
             },
-            ActiveModules = new List<LoadedModule>
-            {
-                new()
+            ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults(
+                new List<LoadedModule>
                 {
-                    ModuleDirectory = "C:/Quarkit/modules/brieflz",
-                    ManifestPath = "C:/Quarkit/modules/brieflz/manifest.json",
-                    Manifest = new ModuleManifest
+                    new()
                     {
-                        Id = "brieflz",
-                        Version = "1.0.0",
-                        CSources = new List<string> { "src/brieflz.c" },
-                        CompilerFlags = new List<string> { "-DCONFIG_FAST_COMPRESSION" }
+                        ModuleDirectory = "C:/Quarkit/modules/brieflz",
+                        ManifestPath = "C:/Quarkit/modules/brieflz/manifest.json",
+                        Manifest = new ModuleManifest
+                        {
+                            Id = "brieflz",
+                            Version = "1.0.0",
+                            Default = {
+                                CSources = new List<string> { "src/brieflz.c" },
+                                CompilerFlags = new List<string> { "-DCONFIG_FAST_COMPRESSION" }
+                            }
+                        }
                     }
-                }
-            }
+                })
         };
         fileSystem.WriteAllText("C:/Quarkit/modules/brieflz/src/brieflz.c", "// This is a module test.");
 
@@ -140,7 +145,9 @@ public class BuildEngineTests
             {
                 Id = "custom-logger",
                 Version = "1.0.0",
-                CSources = new List<string> { "src/log_core.c" }
+                Default = {
+                    CSources = new List<string> { "src/log_core.c" }
+                }
             }
         };
 
@@ -154,13 +161,14 @@ public class BuildEngineTests
             {
                 Id = "brieflz",
                 Version = "1.0.0",
-                CSources = new List<string> { "src/lz.c" },
-                CompilerFlags = new List<string> { "-DBRIEFLZ_MAX_LEVEL=5" }
+                Default = {
+                    CSources = new List<string> { "src/lz.c" },
+                    CompilerFlags = new List<string> { "-DBRIEFLZ_MAX_LEVEL=5" }
+                }
             }
         };
 
         fileSystem.WriteAllText("C:/Quarkit/modules/brieflz/src/lz.c", "void quarkit_brieflz_init() { // mock test }");
-
 
         var parameters = new BuildParameters
         {
@@ -170,7 +178,7 @@ public class BuildEngineTests
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
             ResolvedOptions = new InstallOptions(),
-            ActiveModules = new List<LoadedModule> { moduleA, moduleB }
+            ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB]) 
         };
 
         engine.Build(parameters);
@@ -210,7 +218,7 @@ public class BuildEngineTests
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
             ResolvedOptions = new InstallOptions(),
-            ActiveModules = new List<LoadedModule>()
+            ResolvedModules = []
         };
 
         var action = () => engine.Build(parameters);
