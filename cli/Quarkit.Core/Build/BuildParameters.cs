@@ -19,7 +19,7 @@ namespace Quarkit.Core.Build
         public CompilerType CompilerType { get; init; } = CompilerType.Clang;
 
         // Direct domain engine objects
-        public required InstallerOptions ResolvedOptions { get; init; }
+        public required InstallerBlueprint ResolvedOptions { get; init; }
         public required List<ResolvedModule> ResolvedModules { get; init; } = [];
     }
 }

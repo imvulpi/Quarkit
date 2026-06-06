@@ -1,11 +1,11 @@
 ﻿namespace Quarkit.Models.Manifest.Installer
 {
-    public class InstallerOptionsOverrides : IBlueprintOverride<InstallerOptions>
+    public class InstallerBlueprintOverrides : IBlueprintOverride<InstallerBlueprint>
     {   
         /// <summary>
         /// Overrides to be applied for the specified target.
         /// </summary>
-        public required InstallerOptions Value { get; set; }
+        public required InstallerBlueprint Value { get; set; }
 
         /// <summary>
         /// Specifies which targets should these overrides handle.

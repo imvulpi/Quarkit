@@ -3,7 +3,7 @@
     /// <summary>
     /// Options on how should the installation be performed.
     /// </summary>
-    public class InstallerOptions : IMergeable<InstallerOptions>
+    public class InstallerBlueprint : IMergeable<InstallerBlueprint>
     {
         /// <summary>
         /// Name of the application.
@@ -50,7 +50,7 @@
         /// <summary>
         /// Provides the absolute baseline defaults for Quarkit when nothing else is specified.
         /// </summary>
-        public static InstallerOptions GetGlobalDefaults() => new()
+        public static InstallerBlueprint GetGlobalDefaults() => new()
         {
             AppName = "MyQuarkitApp",
             DesktopShortcut = true,
@@ -65,7 +65,7 @@
         /// Layers properties from a source options object onto this instance, 
         /// ignoring any null values in the source.
         /// </summary>
-        public void MergeFrom(InstallerOptions? source)
+        public void MergeFrom(InstallerBlueprint? source)
         {
             if (source == null) return;
 
@@ -81,9 +81,9 @@
         /// <summary>
         /// Helper to create a deep copy of an option set.
         /// </summary>
-        public InstallerOptions Clone()
+        public InstallerBlueprint Clone()
         {
-            var clone = new InstallerOptions();
+            var clone = new InstallerBlueprint();
             clone.MergeFrom(this);
             return clone;
         }

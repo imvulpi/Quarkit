@@ -11,7 +11,7 @@ public class InstallationManifestOverridesTests
     {
         var manifest = new InstallerManifest
         {
-            Default = new InstallerOptions
+            Default = new InstallerBlueprint
             {
                 AppName = "CoreApp",
                 AdminRequired = false,
@@ -49,7 +49,7 @@ public class InstallationManifestOverridesTests
 
         OverridesResolver resolver = new OverridesResolver();
         TargetKey concreteTarget = new(OSSystem.Windows, Architecture.x86, Bitness.x64);
-        InstallerOptions? resolved = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), concreteTarget, null);
+        InstallerBlueprint? resolved = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), concreteTarget, null);
 
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved.AppName).IsEqualTo("CoreApp"); // From Default
@@ -63,7 +63,7 @@ public class InstallationManifestOverridesTests
     {
         var manifest = new InstallerManifest
         {
-            Default = new InstallerOptions { AppName = "BaseOnly", AdminRequired = false },
+            Default = new InstallerBlueprint { AppName = "BaseOnly", AdminRequired = false },
             Overrides =
             [
                 new() { TargetKey = new TargetKey(OSSystem.Linux), Value = new(){ AdminRequired = true } }
@@ -72,9 +72,9 @@ public class InstallationManifestOverridesTests
 
         OverridesResolver resolver = new();
         TargetKey concreteWindowsTarget = new(OSSystem.Windows, Architecture.x86, Bitness.x64);
-        InstallerOptions defaultOptions = InstallerOptions.GetGlobalDefaults();
+        InstallerBlueprint defaultOptions = InstallerBlueprint.GetGlobalDefaults();
         defaultOptions.MergeFrom(manifest.Default);
-        InstallerOptions? resolved = resolver.ResolveForTarget(defaultOptions, manifest.Overrides.ToArray(), concreteWindowsTarget, null);
+        InstallerBlueprint? resolved = resolver.ResolveForTarget(defaultOptions, manifest.Overrides.ToArray(), concreteWindowsTarget, null);
 
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved.AdminRequired).IsFalse();

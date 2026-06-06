@@ -58,7 +58,7 @@ namespace Quarkit.Core
                 ShorthandEngine buildShorthandEngine = new(globalShorthandEngine);
                 var target = payload.Target;
 
-                InstallerOptions? resolvedOptions = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), target, new(new Dictionary<string, Models.Core.QkOptionDefinition>()));
+                InstallerBlueprint? resolvedOptions = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), target, new(new Dictionary<string, Models.Core.QkOptionDefinition>()));
                 string scratchDir = Path.Join(quarkitRoot, "build", target.GetTriple());
 
                 string payloadName = GetPayloadName(payload);

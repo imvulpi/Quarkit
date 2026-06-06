@@ -22,7 +22,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/bin/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallerOptions(),
+            ResolvedOptions = new InstallerBlueprint(),
             ResolvedModules = []
         };
 
@@ -57,7 +57,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Linux, Architecture.Arm, Bitness.x32),
-            ResolvedOptions = new InstallerOptions(),
+            ResolvedOptions = new InstallerBlueprint(),
             ResolvedModules = []
         };
 
@@ -83,7 +83,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallerOptions
+            ResolvedOptions = new InstallerBlueprint
             {
                 AppName = "TestSuiteApp",
                 AdminRequired = true,
@@ -178,7 +178,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallerOptions(),
+            ResolvedOptions = new InstallerBlueprint(),
             ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB]) 
         };
 
@@ -218,7 +218,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallerOptions(),
+            ResolvedOptions = new InstallerBlueprint(),
             ResolvedModules = []
         };
 

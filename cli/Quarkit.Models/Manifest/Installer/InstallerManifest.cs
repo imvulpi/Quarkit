@@ -48,11 +48,11 @@
         /// <summary>
         /// The base configuration applied to every installer variant.
         /// </summary>
-        public required InstallerOptions Default { get; set; }
+        public required InstallerBlueprint Default { get; set; }
 
         /// <summary>
         /// A collection of selective updates applied to specific OS or architectural matrices.
         /// </summary>
-        public List<InstallerOptionsOverrides> Overrides { get; set; } = [];  
+        public List<InstallerBlueprintOverrides> Overrides { get; set; } = [];  
     }
 }
