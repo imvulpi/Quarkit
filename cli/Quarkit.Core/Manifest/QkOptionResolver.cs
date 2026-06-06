@@ -22,10 +22,6 @@ namespace Quarkit.Core.Manifest
         public Dictionary<string, QkOptionDefinition> OptionDefinitions { get; set; }
         public Dictionary<string, string> OptionAndValues = new();
 
-        public string[] Operators = [
-            "=", "==", "?", "?=", ">", ">=", "<", "<=", "!", "!="
-        ];
-
         public string[] BooleanValues = [
             "true", "false"
         ];
