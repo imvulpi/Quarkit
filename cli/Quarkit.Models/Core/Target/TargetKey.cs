@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace Quarkit.Models.Manifest
+namespace Quarkit.Models.Core.Target
 {
     [StructLayout(LayoutKind.Explicit, Size = 4)]
     public readonly struct TargetKey : IEquatable<TargetKey>

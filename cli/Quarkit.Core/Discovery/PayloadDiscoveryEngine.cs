@@ -1,7 +1,7 @@
 ﻿using Quarkit.Core.Storage;
-using Quarkit.Models.Manifest;
+using Quarkit.Models.Core.Target;
 using System.Runtime.InteropServices;
-using Architecture = Quarkit.Models.Manifest.Architecture;
+using Architecture = Quarkit.Models.Core.Target.Architecture;
 
 namespace Quarkit.Core.Discovery
 {

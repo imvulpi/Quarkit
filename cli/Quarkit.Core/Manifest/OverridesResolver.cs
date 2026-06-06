@@ -1,4 +1,5 @@
 ﻿using Quarkit.Models.Core;
+using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest;
 
 namespace Quarkit.Core.Manifest;

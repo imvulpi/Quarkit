@@ -1,4 +1,6 @@
-﻿namespace Quarkit.Models.Manifest.Modules
+﻿using Quarkit.Models.Core.Target;
+
+namespace Quarkit.Models.Manifest.Modules
 {
     public class ModuleBlueprintOverride : IBlueprintOverride<ModuleBlueprint>
     {

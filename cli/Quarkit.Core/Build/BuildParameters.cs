@@ -1,4 +1,4 @@
-﻿using Quarkit.Models.Manifest;
+﻿using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest.Installer;
 using Quarkit.Models.Manifest.Modules;
 

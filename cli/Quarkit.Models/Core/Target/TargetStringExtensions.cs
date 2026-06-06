@@ -1,6 +1,6 @@
 ﻿using System.Formats.Asn1;
 
-namespace Quarkit.Models.Manifest
+namespace Quarkit.Models.Core.Target
 {
     public static class TargetStringExtensions
     {

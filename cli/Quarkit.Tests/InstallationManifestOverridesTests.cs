@@ -1,5 +1,5 @@
 ﻿using Quarkit.Core.Manifest;
-using Quarkit.Models.Manifest;
+using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest.Installer;
 
 namespace Quarkit.Tests;

@@ -5,7 +5,7 @@ using Quarkit.Core.Modules;
 using Quarkit.Core.Processes;
 using Quarkit.Core.Shorthand;
 using Quarkit.Core.Storage;
-using Quarkit.Models.Manifest;
+using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest.Installer;
 using Quarkit.Models.Manifest.Modules;
 using System.Text.Json;

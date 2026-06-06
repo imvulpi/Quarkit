@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Quarkit.Models.Manifest
+namespace Quarkit.Models.Core.Target
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Bitness : byte

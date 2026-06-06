@@ -1,4 +1,6 @@
-﻿namespace Quarkit.Models.Manifest.Installer
+﻿using Quarkit.Models.Core.Target;
+
+namespace Quarkit.Models.Manifest.Installer
 {
     public class AutoDiscovery
     {

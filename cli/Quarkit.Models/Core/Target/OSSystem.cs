@@ -1,28 +1,28 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Quarkit.Models.Manifest
+namespace Quarkit.Models.Core.Target
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum Architecture : byte
+    public enum OSSystem : ushort
     {
         /// <summary>
-        /// The cpu architecture was not specified.
+        /// The operating system was not specified.
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// x86 Cpu Architecture (x86_32bit and x86_64 bit).
+        /// Linux system.
         /// </summary>
-        x86,
+        Linux, 
 
         /// <summary>
-        /// Arm Cpu Architecture.
+        /// Windows system.
         /// </summary>
-        Arm,
+        Windows, 
 
         /// <summary>
-        /// RiscV Cpu Architecture.
+        /// MacOS system.
         /// </summary>
-        RiscV
+        MacOS
     }
 }

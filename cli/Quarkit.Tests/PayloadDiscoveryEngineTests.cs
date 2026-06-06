@@ -1,5 +1,5 @@
 ﻿using Quarkit.Core.Discovery;
-using Quarkit.Models.Manifest;
+using Quarkit.Models.Core.Target;
 using Quarkit.Tests.Mocks;
 
 namespace Quarkit.Tests;
