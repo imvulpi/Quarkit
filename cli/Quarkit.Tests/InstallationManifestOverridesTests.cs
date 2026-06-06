@@ -1,5 +1,6 @@
 ﻿using Quarkit.Core.Manifest;
 using Quarkit.Models.Manifest;
+using Quarkit.Models.Manifest.Installer;
 
 namespace Quarkit.Tests;
 
@@ -8,9 +9,9 @@ public class InstallationManifestOverridesTests
     [Test]
     public async Task CascadingOverrides_ShouldLayerPropertiesProgressively()
     {
-        var manifest = new InstallManifestEditor
+        var manifest = new InstallerManifest
         {
-            Default = new InstallOptions
+            Default = new InstallerOptions
             {
                 AppName = "CoreApp",
                 AdminRequired = false,
@@ -48,7 +49,7 @@ public class InstallationManifestOverridesTests
 
         OverridesResolver resolver = new OverridesResolver();
         TargetKey concreteTarget = new(OSSystem.Windows, Architecture.x86, Bitness.x64);
-        InstallOptions? resolved = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), concreteTarget, null);
+        InstallerOptions? resolved = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), concreteTarget, null);
 
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved.AppName).IsEqualTo("CoreApp"); // From Default
@@ -60,9 +61,9 @@ public class InstallationManifestOverridesTests
     [Test]
     public async Task ResolveForTarget_WhenNoOverridesMatch_ShouldReturnDefaults()
     {
-        var manifest = new InstallManifestEditor
+        var manifest = new InstallerManifest
         {
-            Default = new InstallOptions { AppName = "BaseOnly", AdminRequired = false },
+            Default = new InstallerOptions { AppName = "BaseOnly", AdminRequired = false },
             Overrides =
             [
                 new() { TargetKey = new TargetKey(OSSystem.Linux), Value = new(){ AdminRequired = true } }
@@ -71,9 +72,9 @@ public class InstallationManifestOverridesTests
 
         OverridesResolver resolver = new();
         TargetKey concreteWindowsTarget = new(OSSystem.Windows, Architecture.x86, Bitness.x64);
-        InstallOptions defaultOptions = InstallOptions.GetGlobalDefaults();
+        InstallerOptions defaultOptions = InstallerOptions.GetGlobalDefaults();
         defaultOptions.MergeFrom(manifest.Default);
-        InstallOptions? resolved = resolver.ResolveForTarget(defaultOptions, manifest.Overrides.ToArray(), concreteWindowsTarget, null);
+        InstallerOptions? resolved = resolver.ResolveForTarget(defaultOptions, manifest.Overrides.ToArray(), concreteWindowsTarget, null);
 
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved.AdminRequired).IsFalse();

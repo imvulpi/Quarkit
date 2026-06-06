@@ -1,5 +1,6 @@
 ﻿using Quarkit.Core.Build;
 using Quarkit.Models.Manifest;
+using Quarkit.Models.Manifest.Installer;
 using Quarkit.Models.Manifest.Modules;
 using Quarkit.Tests.Mocks;
 
@@ -21,7 +22,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/bin/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallOptions(),
+            ResolvedOptions = new InstallerOptions(),
             ResolvedModules = []
         };
 
@@ -56,7 +57,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Linux, Architecture.Arm, Bitness.x32),
-            ResolvedOptions = new InstallOptions(),
+            ResolvedOptions = new InstallerOptions(),
             ResolvedModules = []
         };
 
@@ -82,7 +83,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallOptions
+            ResolvedOptions = new InstallerOptions
             {
                 AppName = "TestSuiteApp",
                 AdminRequired = true,
@@ -177,7 +178,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallOptions(),
+            ResolvedOptions = new InstallerOptions(),
             ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB]) 
         };
 
@@ -217,7 +218,7 @@ public class BuildEngineTests
             OutputPath = "C:/Output/installer.exe",
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-            ResolvedOptions = new InstallOptions(),
+            ResolvedOptions = new InstallerOptions(),
             ResolvedModules = []
         };
 

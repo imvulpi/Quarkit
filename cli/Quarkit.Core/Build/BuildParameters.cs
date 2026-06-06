@@ -1,4 +1,5 @@
 ﻿using Quarkit.Models.Manifest;
+using Quarkit.Models.Manifest.Installer;
 using Quarkit.Models.Manifest.Modules;
 
 namespace Quarkit.Core.Build
@@ -18,7 +19,7 @@ namespace Quarkit.Core.Build
         public CompilerType CompilerType { get; init; } = CompilerType.Clang;
 
         // Direct domain engine objects
-        public required InstallOptions ResolvedOptions { get; init; }
+        public required InstallerOptions ResolvedOptions { get; init; }
         public required List<ResolvedModule> ResolvedModules { get; init; } = [];
     }
 }

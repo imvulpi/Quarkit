@@ -1,4 +1,4 @@
-﻿namespace Quarkit.Models.Manifest
+﻿namespace Quarkit.Models.Manifest.Installer
 {
     public class AutoDiscovery
     {
@@ -13,7 +13,7 @@
         public string? TargetPayloadSuffix { get; set; } // e.g., "/publish" or "/bin"
     }
 
-    public class InstallManifestEditor
+    public class InstallerManifest
     {
         public InstallerCreatorOptions? CreatorOptions { get; set; }
 
@@ -48,11 +48,11 @@
         /// <summary>
         /// The base configuration applied to every installer variant.
         /// </summary>
-        public required InstallOptions Default { get; set; }
+        public required InstallerOptions Default { get; set; }
 
         /// <summary>
         /// A collection of selective updates applied to specific OS or architectural matrices.
         /// </summary>
-        public List<InstallOptionsOverrides> Overrides { get; set; } = [];  
+        public List<InstallerOptionsOverrides> Overrides { get; set; } = [];  
     }
 }

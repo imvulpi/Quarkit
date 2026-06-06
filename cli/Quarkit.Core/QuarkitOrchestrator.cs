@@ -6,6 +6,7 @@ using Quarkit.Core.Processes;
 using Quarkit.Core.Shorthand;
 using Quarkit.Core.Storage;
 using Quarkit.Models.Manifest;
+using Quarkit.Models.Manifest.Installer;
 using Quarkit.Models.Manifest.Modules;
 using System.Text.Json;
 
@@ -18,7 +19,7 @@ namespace Quarkit.Core
         public void Build(string manifestPath)
         {
             if (File.Exists(manifestPath)) return;
-            var manifest = JsonSerializer.Deserialize<InstallManifestEditor>(File.ReadAllText(manifestPath));
+            var manifest = JsonSerializer.Deserialize<InstallerManifest>(File.ReadAllText(manifestPath));
             var manifestDir = Path.GetDirectoryName(manifestPath);
             if (manifest == null || manifestDir == null) {
                 Console.WriteLine($"Could not find the Quarkit installer manifest.");
@@ -57,7 +58,7 @@ namespace Quarkit.Core
                 ShorthandEngine buildShorthandEngine = new(globalShorthandEngine);
                 var target = payload.Target;
 
-                InstallOptions? resolvedOptions = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), target, new(new Dictionary<string, Models.Core.QkOptionDefinition>()));
+                InstallerOptions? resolvedOptions = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), target, new(new Dictionary<string, Models.Core.QkOptionDefinition>()));
                 string scratchDir = Path.Join(quarkitRoot, "build", target.GetTriple());
 
                 string payloadName = GetPayloadName(payload);
@@ -130,7 +131,7 @@ namespace Quarkit.Core
             }
         }
 
-        private static bool IsManifestSupportiveOfTarget(InstallManifestEditor manifest, TargetKey targetKey)
+        private static bool IsManifestSupportiveOfTarget(InstallerManifest manifest, TargetKey targetKey)
         {
             if (manifest.SupportedSystems != null && !manifest.SupportedSystems.Contains(targetKey.System)) return false;
             if (manifest.SupportedArchitectures != null && !manifest.SupportedArchitectures.Contains(targetKey.Arch)) return false;

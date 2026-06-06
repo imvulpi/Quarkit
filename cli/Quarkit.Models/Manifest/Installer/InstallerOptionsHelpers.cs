@@ -1,13 +1,13 @@
-﻿namespace Quarkit.Models.Manifest
+﻿namespace Quarkit.Models.Manifest.Installer
 {
-    public static class InstallOptionsHelpers
+    public static class InstallerOptionsHelpers
     {
 
-        public static InstallOptions MergeWith(this InstallOptions baseOptions, InstallOptions? overrideOptions)
+        public static InstallerOptions MergeWith(this InstallerOptions baseOptions, InstallerOptions? overrideOptions)
         {
             if (overrideOptions == null) return baseOptions;
 
-            return new InstallOptions
+            return new InstallerOptions
             {
                 AppName = overrideOptions.AppName ?? baseOptions.AppName,
                 DesktopShortcut = overrideOptions.DesktopShortcut ?? baseOptions.DesktopShortcut,

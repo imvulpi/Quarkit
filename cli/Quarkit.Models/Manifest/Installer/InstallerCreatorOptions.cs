@@ -1,4 +1,4 @@
-﻿namespace Quarkit.Models.Manifest
+﻿namespace Quarkit.Models.Manifest.Installer
 {
     public class InstallerCreatorOptions
     {

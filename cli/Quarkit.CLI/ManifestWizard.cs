@@ -1,6 +1,6 @@
 ﻿namespace Quarkit.CLI
 {
-    using Quarkit.Models.Manifest;
+    using Quarkit.Models.Manifest.Installer;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -58,7 +58,7 @@
                 Console.ResetColor();
             }
 
-            InstallManifestEditor manifest = new()
+            InstallerManifest manifest = new()
             {
                 AutoDiscovery = new()
                 {
