@@ -12,9 +12,9 @@
         public void MergeFrom(ModuleBlueprint source)
         {
             // This overrides all the values. Doesn't append. (Possible TODO).
-            if(source.HasInitHook != null) HasInitHook = source.HasInitHook.Value;
-            if(source.HasDeInitHook != null) HasDeInitHook = source.HasDeInitHook.Value;
-            if(source.PreBuildCommands != null) PreBuildCommands = source.PreBuildCommands;
+            if (source.HasInitHook != null) HasInitHook = source.HasInitHook.Value;
+            if (source.HasDeInitHook != null) HasDeInitHook = source.HasDeInitHook.Value;
+            if (source.PreBuildCommands != null) PreBuildCommands = source.PreBuildCommands;
             Dependencies = MergeDelta(Dependencies, source.Dependencies);
             CSources = MergeDelta(CSources, source.CSources);
             CompilerFlags = MergeDelta(CompilerFlags, source.CompilerFlags);

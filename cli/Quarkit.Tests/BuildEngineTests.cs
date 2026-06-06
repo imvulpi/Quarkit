@@ -1,6 +1,5 @@
 ﻿using Quarkit.Core.Build;
 using Quarkit.Models.Core.Target;
-using Quarkit.Models.Manifest;
 using Quarkit.Models.Manifest.Installer;
 using Quarkit.Models.Manifest.Modules;
 using Quarkit.Tests.Mocks;
@@ -180,7 +179,7 @@ public class BuildEngineTests
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
             ResolvedOptions = new InstallerBlueprint(),
-            ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB]) 
+            ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB])
         };
 
         engine.Build(parameters);

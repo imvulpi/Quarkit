@@ -9,7 +9,7 @@ namespace Quarkit.Tests.Mocks
             List<ResolvedModule> resolvedModules = [];
             foreach (var module in loadedModules)
             {
-                resolvedModules.Add(new ResolvedModule() { Blueprint = module.Manifest.Default, Module =  module });
+                resolvedModules.Add(new ResolvedModule() { Blueprint = module.Manifest.Default, Module = module });
             }
             return resolvedModules;
         }

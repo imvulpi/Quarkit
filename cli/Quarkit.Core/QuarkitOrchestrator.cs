@@ -21,7 +21,8 @@ namespace Quarkit.Core
             if (File.Exists(manifestPath)) return;
             var manifest = JsonSerializer.Deserialize<InstallerManifest>(File.ReadAllText(manifestPath));
             var manifestDir = Path.GetDirectoryName(manifestPath);
-            if (manifest == null || manifestDir == null) {
+            if (manifest == null || manifestDir == null)
+            {
                 Console.WriteLine($"Could not find the Quarkit installer manifest.");
                 Console.WriteLine($"--help for more information.\n");
                 Console.WriteLine($"Searched in: {manifestDir}");
@@ -48,7 +49,8 @@ namespace Quarkit.Core
             OverridesResolver resolver = new OverridesResolver();
 
             var payloads = discoveryEngine.DiscoverPayloads(manifest.AutoDiscovery?.TargetRootDirectory ?? "", manifest.AutoDiscovery?.TargetPayloadSuffix ?? "");
-            foreach (var payload in payloads) {
+            foreach (var payload in payloads)
+            {
                 if (!IsManifestSupportiveOfTarget(manifest, payload.Target))
                 {
                     Console.WriteLine($"Found a target: {payload.FolderName}(interpreted as: {payload.Target.GetTriple()}), but the target is not supported in the manifest. " +
@@ -71,7 +73,8 @@ namespace Quarkit.Core
                 List<LoadedModule> loadedModules = [];
                 string coreModuleDir = Path.Combine(quarkitRoot, Paths.GetInstallerDir(target.System));
                 loadedModules.Add(modulesEngine.FindAndLoadModule("", coreModuleDir)); // Should be first.
-                if (resolvedOptions.Modules != null) {
+                if (resolvedOptions.Modules != null)
+                {
                     foreach (var module in resolvedOptions.Modules)
                         loadedModules.Add(modulesEngine.FindAndLoadModule(module, manifestDir));
                 }
@@ -79,7 +82,7 @@ namespace Quarkit.Core
                 List<ResolvedModule> resolvedModules = new List<ResolvedModule>(loadedModules.Count);
                 foreach (LoadedModule module in loadedModules)
                 {
-                    if(module.Manifest.Overrides == null)
+                    if (module.Manifest.Overrides == null)
                     {
                         resolvedModules.Add(new()
                         {

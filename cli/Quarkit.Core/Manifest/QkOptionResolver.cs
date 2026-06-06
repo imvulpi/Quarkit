@@ -40,7 +40,7 @@ namespace Quarkit.Core.Manifest
 
                 if (OptionDefinitions.TryGetValue(parsedExpresion.Option, out var optionDefinition))
                 {
-                    if(!ResolveExpression(parsedExpresion, optionDefinition)) return false;
+                    if (!ResolveExpression(parsedExpresion, optionDefinition)) return false;
                 }
                 else
                 {
@@ -71,7 +71,7 @@ namespace Quarkit.Core.Manifest
                     OptionAndValues[option] = remoteValue;
                     return true;
                 case QkOperator.Equal: // No nulls.
-                    return remoteValue == localValue; 
+                    return remoteValue == localValue;
                 case QkOperator.NotEqual:
                     return remoteValue != localValue;
                 case QkOperator.IfNull: // Returns true if value is null
@@ -139,12 +139,12 @@ namespace Quarkit.Core.Manifest
                         return false;
                     }
                 case QkOperator.Lesser:
-                                        {
+                    {
                         if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && localDouble < remoteDouble) return true;
                         return false;
                     }
                 case QkOperator.LesserEqual:
-                                        {
+                    {
                         if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && localDouble <= remoteDouble) return true;
                         return false;
                     }
@@ -158,7 +158,7 @@ namespace Quarkit.Core.Manifest
             switch (qkOperator)
             {
                 case QkOperator.Assignment:
-                    _assignment:
+                _assignment:
                     string lowerRemoteValue = remoteValue.ToLower();
                     if (lowerRemoteValue == "null")
                     {
@@ -171,20 +171,20 @@ namespace Quarkit.Core.Manifest
                     return true;
                 case QkOperator.Equal:
                     if (localValue == null && remoteValue.ToLower() == "null") return true;
-                    else if(localValue != null  && remoteValue.ToLower() == localValue) return true;
+                    else if (localValue != null && remoteValue.ToLower() == localValue) return true;
                     return false;
                 case QkOperator.NotEqual:
                     if (localValue == null && remoteValue.ToLower() == "null") return false;
                     else if (localValue != null && remoteValue.ToLower() == localValue) return false;
                     return true;
                 case QkOperator.IfNull: // Returns true if value is null
-                    if(localValue == null) return true;
+                    if (localValue == null) return true;
                     return false;
                 case QkOperator.IfNotNull: // Returns true if there is value
                     if (localValue != null) return true;
                     return false;
                 case QkOperator.IfNullEqual: // Sets if the local value is null
-                    if(localValue == null) goto _assignment;
+                    if (localValue == null) goto _assignment;
                     return true; // Always true
                 default: return false;
             }
@@ -220,7 +220,7 @@ namespace Quarkit.Core.Manifest
                 }
             }
 
-            _resolved:
+        _resolved:
 
             if (qkOperator != null)
             {

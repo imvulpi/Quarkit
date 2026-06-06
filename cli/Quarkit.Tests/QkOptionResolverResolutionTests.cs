@@ -2,6 +2,7 @@
 using Quarkit.Models.Core;
 
 namespace Quarkit.Tests;
+
 public class QkOptionResolverResolutionTests
 {
     private QkOptionResolver _resolver = null!;
@@ -20,7 +21,7 @@ public class QkOptionResolverResolutionTests
     public async Task String_Assignment_ShouldUpdateLocalValueAndReturnTrue()
     {
         var expr = new QkOptionExpression { Option = "theme", Operator = QkOperator.Assignment, Value = "dark" };
-        var def = new QkOptionDefinition { Name="theme", Type = QkType.String };
+        var def = new QkOptionDefinition { Name = "theme", Type = QkType.String };
 
         var result = _resolver.ResolveExpression(expr, def);
 
@@ -37,7 +38,7 @@ public class QkOptionResolverResolutionTests
     {
         _resolver.OptionAndValues["theme"] = localValue;
         var expr = new QkOptionExpression { Option = "theme", Operator = op, Value = remoteValue };
-        var def = new QkOptionDefinition { Name="theme", Type = QkType.String };
+        var def = new QkOptionDefinition { Name = "theme", Type = QkType.String };
 
         var result = _resolver.ResolveExpression(expr, def);
 
@@ -53,7 +54,7 @@ public class QkOptionResolverResolutionTests
     {
         if (localValue != null) _resolver.OptionAndValues["theme"] = localValue;
         var expr = new QkOptionExpression { Option = "theme", Operator = op, Value = "ignored" };
-        var def = new QkOptionDefinition { Name="theme", Type = QkType.String };
+        var def = new QkOptionDefinition { Name = "theme", Type = QkType.String };
 
         var result = _resolver.ResolveExpression(expr, def);
 
@@ -65,7 +66,7 @@ public class QkOptionResolverResolutionTests
     {
         // theme is missing/null in dictionary
         var expr = new QkOptionExpression { Option = "theme", Operator = QkOperator.IfNullEqual, Value = "fallback" };
-        var def = new QkOptionDefinition { Name="theme", Type = QkType.String };
+        var def = new QkOptionDefinition { Name = "theme", Type = QkType.String };
 
         var result = _resolver.ResolveExpression(expr, def);
 
@@ -126,7 +127,7 @@ public class QkOptionResolverResolutionTests
     public async Task Boolean_Assignment_ValidValue_ShouldSucceed(string remoteValue)
     {
         var expr = new QkOptionExpression { Option = "enabled", Operator = QkOperator.Assignment, Value = remoteValue };
-        var def = new QkOptionDefinition { Name="enabled", Type = QkType.Boolean };
+        var def = new QkOptionDefinition { Name = "enabled", Type = QkType.Boolean };
 
         var result = _resolver.ResolveExpression(expr, def);
 
@@ -138,7 +139,7 @@ public class QkOptionResolverResolutionTests
     public void Boolean_Assignment_InvalidValue_ShouldThrowException()
     {
         var expr = new QkOptionExpression { Option = "enabled", Operator = QkOperator.Assignment, Value = "maybe" };
-        var def = new QkOptionDefinition { Name= "enabled", Type = QkType.Boolean };
+        var def = new QkOptionDefinition { Name = "enabled", Type = QkType.Boolean };
 
         Assert.Throws<InvalidOperationException>(() => _resolver.ResolveExpression(expr, def));
     }
@@ -153,7 +154,7 @@ public class QkOptionResolverResolutionTests
     {
         if (localValue != null) _resolver.OptionAndValues["enabled"] = localValue;
         var expr = new QkOptionExpression { Option = "enabled", Operator = op, Value = remoteValue };
-        var def = new QkOptionDefinition { Name= "enabled", Type = QkType.Boolean };
+        var def = new QkOptionDefinition { Name = "enabled", Type = QkType.Boolean };
 
         var result = _resolver.ResolveExpression(expr, def);
 

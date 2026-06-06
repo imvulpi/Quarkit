@@ -55,7 +55,7 @@ namespace Quarkit.Core.Shorthand
             string normalizedKey = key.StartsWith(OPENING_TAG) && key.EndsWith(CLOSING_TAG) ? key : $"{OPENING_TAG}{key}{CLOSING_TAG}";
             tokensAndValues[normalizedKey] = value; // Overwrites or sets
         }
-       
+
         /// <summary>
         /// Expands tokens in <paramref name="input"/> from the values in <paramref name="contextualTokens"/> or global token registry if any exist.
         /// </summary>

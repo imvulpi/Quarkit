@@ -55,6 +55,6 @@ namespace Quarkit.Models.Manifest.Installer
         /// <summary>
         /// A collection of selective updates applied to specific OS or architectural matrices.
         /// </summary>
-        public List<InstallerBlueprintOverrides> Overrides { get; set; } = [];  
+        public List<InstallerBlueprintOverrides> Overrides { get; set; } = [];
     }
 }

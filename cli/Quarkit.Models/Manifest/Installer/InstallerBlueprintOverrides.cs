@@ -3,7 +3,7 @@
 namespace Quarkit.Models.Manifest.Installer
 {
     public class InstallerBlueprintOverrides : IBlueprintOverride<InstallerBlueprint>
-    {   
+    {
         /// <summary>
         /// Overrides to be applied for the specified target.
         /// </summary>

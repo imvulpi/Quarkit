@@ -1,6 +1,7 @@
 ﻿using Quarkit.Core.Processes;
 
 namespace Quarkit.Tests.Mocks;
+
 public class MockProcessRunner : IProcessRunner
 {
     public class ExecutedCommand

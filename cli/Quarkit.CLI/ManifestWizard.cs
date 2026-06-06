@@ -47,7 +47,7 @@
                 Console.WriteLine("[!] Warning: No standard target triples (like win-x64, linux-x64) were automatically found in that path.");
                 Console.WriteLine("    This is fine as long as your framework supports the target triples when building the installers.");
                 Console.ResetColor();
-                
+
                 // Some default targets:
                 discoveredTargets.AddRange(["windows-x64", "linux-x64"]);
             }

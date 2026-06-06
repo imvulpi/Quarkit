@@ -13,12 +13,12 @@ namespace Quarkit.Models.Core.Target
         /// <summary>
         /// Linux system.
         /// </summary>
-        Linux, 
+        Linux,
 
         /// <summary>
         /// Windows system.
         /// </summary>
-        Windows, 
+        Windows,
 
         /// <summary>
         /// MacOS system.

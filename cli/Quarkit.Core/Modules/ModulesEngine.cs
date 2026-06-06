@@ -37,7 +37,7 @@ namespace Quarkit.Core.Modules
             foreach (string dir in _fileSystem.GetDirectories(globalModulesPath))
             {
                 string moduleName = Path.GetFileName(dir);
-                _globalModulesIndex[moduleName] = dir; 
+                _globalModulesIndex[moduleName] = dir;
             }
         }
 
@@ -134,12 +134,12 @@ namespace Quarkit.Core.Modules
                     throw new Exception($"{module.Manifest.Id} module ran `{executable} {arguments}` and it failed with: {exitCode} exit code.\nStandardError output: {error}");
                 }
 
-                if(command.FailIfOutputContains != null && (output.Contains(command.FailIfOutputContains) || error.Contains(command.FailIfOutputContains)))
+                if (command.FailIfOutputContains != null && (output.Contains(command.FailIfOutputContains) || error.Contains(command.FailIfOutputContains)))
                 {
                     throw new Exception($"{module.Manifest.Id} module ran `{executable} {arguments}`, and the output contains {command.FailIfOutputContains} which signifies failure.\nStandardError output: {error}");
                 }
 
-                if(command.FailOnStdErr != null && command.FailOnStdErr.Value && error != string.Empty)
+                if (command.FailOnStdErr != null && command.FailOnStdErr.Value && error != string.Empty)
                 {
                     throw new Exception($"{module.Manifest.Id} module ran `{executable} {arguments}`, and the StandardError output is not empty which signifies failure.\nStandardError output: {error}");
                 }
@@ -162,7 +162,7 @@ namespace Quarkit.Core.Modules
                         if (line.Contains('=')) // Very simple check
                         {
                             string[] kv = line.Split('=');
-                            if(kv.Length >= 2)
+                            if (kv.Length >= 2)
                             {
                                 shorthandEngine.SetToken(kv[0], kv[1]);
                             }

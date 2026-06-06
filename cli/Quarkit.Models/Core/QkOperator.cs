@@ -2,14 +2,14 @@
 {
     public enum QkOperator
     {
-        Assignment, 
+        Assignment,
         Equal,
         NotEqual,
         IfNull,
         IfNotNull,
         IfNullEqual,
         Greater,
-        GreaterEqual, 
+        GreaterEqual,
         Lesser,
         LesserEqual
     }

@@ -2,7 +2,6 @@
 using Quarkit.Core.Storage;
 using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest.Modules;
-using System.Xml;
 
 namespace Quarkit.Core.Build
 {
@@ -157,16 +156,16 @@ namespace Quarkit.Core.Build
                 // Very simple check inside the first file
                 foreach (string line in _fileSystem.ReadLines(resolvedMod.GetAbsoluteCSources().First()))
                 {
-                    if(line.Contains("void") && line.Contains("quarkit") && line.Contains(hookName))
+                    if (line.Contains("void") && line.Contains("quarkit") && line.Contains(hookName))
                     {
                         bool previousWasComment = false;
                         for (int i = 0; i < line.Length; i++)
                         {
                             var current = line[i];
-                            
+
                             // Very simple check for comment.
                             if (previousWasComment && (current == '/' || current == '*')) return false;
-                            
+
                             if (current == '/') previousWasComment = true;
                             else if (current == 'v') return true; // beginning of 'void'
                         }
@@ -182,11 +181,12 @@ namespace Quarkit.Core.Build
                 if (hookOption == true) return true;
                 if (hookOption == false) return false;
             }
-            
+
             return false;
         }
 
-        private string GetGccTargetWindows(Architecture targetArch, Bitness targetBitness) {
+        private string GetGccTargetWindows(Architecture targetArch, Bitness targetBitness)
+        {
             if (targetArch == Architecture.x86 && targetBitness == Bitness.x64) return "x86_64-w64-mingw32-gcc";
             else if (targetArch == Architecture.x86 && targetBitness == Bitness.x32) return "i686-w64-mingw32-gcc";
             else if (targetArch == Architecture.Arm && targetBitness == Bitness.x64) return "aarch64-w64-mingw32-gcc";
@@ -194,7 +194,8 @@ namespace Quarkit.Core.Build
             return string.Empty;
         }
 
-        private string GetGccTargetLinux(Architecture targetArch, Bitness targetBitness) {
+        private string GetGccTargetLinux(Architecture targetArch, Bitness targetBitness)
+        {
             if (targetArch == Architecture.x86 && targetBitness == Bitness.x64) return "x86_64-linux-gnu-gcc";
             else if (targetArch == Architecture.x86 && targetBitness == Bitness.x32) return "i686-linux-gnu-gcc";
             else if (targetArch == Architecture.Arm && targetBitness == Bitness.x64) return "aarch64-linux-gnu-gcc";
@@ -202,7 +203,8 @@ namespace Quarkit.Core.Build
             return string.Empty;
         }
 
-        private string GetClangTargetWindows(Architecture targetArch, Bitness targetBitness) {
+        private string GetClangTargetWindows(Architecture targetArch, Bitness targetBitness)
+        {
             if (targetArch == Architecture.x86 && targetBitness == Bitness.x64) return "x86_64-w64-windows-gnu";
             else if (targetArch == Architecture.x86 && targetBitness == Bitness.x32) return "i686-w64-windows-gnu";
             else if (targetArch == Architecture.Arm && targetBitness == Bitness.x64) return "aarch64-w64-windows-gnu";
@@ -210,7 +212,8 @@ namespace Quarkit.Core.Build
             return string.Empty;
         }
 
-        private string GetClangTargetLinux(Architecture targetArch, Bitness targetBitness) {
+        private string GetClangTargetLinux(Architecture targetArch, Bitness targetBitness)
+        {
             if (targetArch == Architecture.x86 && targetBitness == Bitness.x64) return "x86_64-linux-gnu";
             else if (targetArch == Architecture.x86 && targetBitness == Bitness.x32) return "i686-linux-gnu";
             else if (targetArch == Architecture.Arm && targetBitness == Bitness.x64) return "aarch64-linux-gnu";

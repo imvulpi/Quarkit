@@ -2,7 +2,6 @@
 using Quarkit.Core.Shorthand;
 using Quarkit.Models.Manifest.Modules;
 using Quarkit.Tests.Mocks;
-using System.Data;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -92,7 +91,7 @@ public class ModulesEngineTests
         var mockRunner = new MockProcessRunner();
 
         mockFs.CreateDirectory("C:/Project/modules/bad-json");
-        mockFs.WriteAllText("C:/Project/modules/bad-json/module.json",  "{ \"Name\": bad-module, "); // Name instead of Id, missing bracket "
+        mockFs.WriteAllText("C:/Project/modules/bad-json/module.json", "{ \"Name\": bad-module, "); // Name instead of Id, missing bracket "
 
         var engine = new ModulesEngine("C:/QuarkitCore", mockFs, mockRunner);
 
@@ -109,9 +108,10 @@ public class ModulesEngineTests
         mockFs.CreateDirectory("C:/Project/modules/bad-json");
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - Disabled to simulate bad json.
         mockFs.WriteAllText("C:/Project/modules/bad-json/module.json", JsonSerializer.Serialize(
-                new ModuleManifest() { 
-                    Id = null, 
-                    Version = null, 
+                new ModuleManifest()
+                {
+                    Id = null,
+                    Version = null,
                     Default = {
                        CSources = new(["./src/bad-code.c"])
                     }

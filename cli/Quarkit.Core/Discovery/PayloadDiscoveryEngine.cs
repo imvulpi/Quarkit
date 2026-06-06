@@ -75,7 +75,7 @@ namespace Quarkit.Core.Discovery
             if (potentialRid.Contains("64")) bit = Bitness.x64;
 
             if (potentialRid.Contains("x86") || potentialRid.Contains("amd")) return new(system, Architecture.x86, bit);
-            else if(potentialRid.Contains("arm") || potentialRid.Contains("aarch")) return new(system, Architecture.Arm, bit); 
+            else if (potentialRid.Contains("arm") || potentialRid.Contains("aarch")) return new(system, Architecture.Arm, bit);
             else if (potentialRid.Contains("riscv") || potentialRid.Contains("mips")) return new(system, Architecture.RiscV, bit);
             else if (arch == Architecture.None && potentialRid.Contains("x64")) return new(system, Architecture.x86, Bitness.x64);
 

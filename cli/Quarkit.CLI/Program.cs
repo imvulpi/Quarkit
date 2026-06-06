@@ -17,10 +17,11 @@ internal class Program
 
             string workingDirectory = Directory.GetCurrentDirectory();
             Console.WriteLine($"Checking for Quarkit in: \n{workingDirectory}\n");
-        
+
             QuarkitOrchestrator quarkit = new();
             quarkit.Build(Path.Combine(workingDirectory, "quarkit.json"));
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine($"Error caught: {ex}");
         }
@@ -100,8 +101,8 @@ internal class Program
                          "  --help         | You are here :)\n" +
                          "  --new          | Launches wizards for installation or other manifests.\n" +
                          "    Options:\n" +
-                         "      (none)    - Implicitly launches the installer manifest wizard.\n"+
-                         "      installer - Launches a installer manifest creation wizard.\n"+
+                         "      (none)    - Implicitly launches the installer manifest wizard.\n" +
+                         "      installer - Launches a installer manifest creation wizard.\n" +
                          "      module    - Launches a module manifest creation wizard.\n";
         Console.WriteLine(message);
     }
@@ -109,8 +110,8 @@ internal class Program
     static bool EnsureHasValue(int currentIndex, int totalCount, string flagName, bool required = true)
     {
         if (currentIndex + 1 < totalCount) return true;
-        if(required) Console.WriteLine($"Error: The argument '{flagName}' requires a value after it.");
-        
+        if (required) Console.WriteLine($"Error: The argument '{flagName}' requires a value after it.");
+
         return false;
     }
 }
