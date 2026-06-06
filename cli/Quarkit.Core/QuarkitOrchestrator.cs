@@ -1,6 +1,5 @@
 ﻿using Quarkit.Core.Build;
 using Quarkit.Core.Discovery;
-using Quarkit.Core.Installation;
 using Quarkit.Core.Manifest;
 using Quarkit.Core.Modules;
 using Quarkit.Core.Processes;
@@ -8,18 +7,18 @@ using Quarkit.Core.Shorthand;
 using Quarkit.Core.Storage;
 using Quarkit.Models.Manifest;
 using Quarkit.Models.Manifest.Modules;
+using System.Text.Json;
 
 namespace Quarkit.Core
 {
     public class QuarkitOrchestrator
     {
-        public InstallationManifestEngine ManifestEngine { get; set; } = new();
-
         public const string DEFAULT_DISTRIBUTION_DIR = "quarkit_distribution";
 
         public void Build(string manifestPath)
         {
-            var manifest = ManifestEngine.Load(manifestPath);
+            if (File.Exists(manifestPath)) return;
+            var manifest = JsonSerializer.Deserialize<InstallManifestEditor>(File.ReadAllText(manifestPath));
             var manifestDir = Path.GetDirectoryName(manifestPath);
             if (manifest == null || manifestDir == null) {
                 Console.WriteLine($"Could not find the Quarkit installer manifest.");
@@ -42,10 +41,10 @@ namespace Quarkit.Core
 
             PhysicalFileSystem physicalFileSystem = new();
             ProcessRunner systemProcessRunner = new();
-            InstallationManifestEngine manifestEngine = new();
             PayloadDiscoveryEngine discoveryEngine = new(physicalFileSystem);
             ModulesEngine modulesEngine = new(quarkitRoot, physicalFileSystem, systemProcessRunner);
             BuildEngine buildEngine = new(physicalFileSystem, systemProcessRunner);
+            OverridesResolver resolver = new OverridesResolver();
 
             var payloads = discoveryEngine.DiscoverPayloads(manifest.AutoDiscovery?.TargetRootDirectory ?? "", manifest.AutoDiscovery?.TargetPayloadSuffix ?? "");
             foreach (var payload in payloads) {
@@ -58,7 +57,7 @@ namespace Quarkit.Core
                 ShorthandEngine buildShorthandEngine = new(globalShorthandEngine);
                 var target = payload.Target;
 
-                InstallOptions resolvedOptions = manifestEngine.ResolveForTarget(manifest, target);
+                InstallOptions? resolvedOptions = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), target, new(new Dictionary<string, Models.Core.QkOptionDefinition>()));
                 string scratchDir = Path.Join(quarkitRoot, "build", target.GetTriple());
 
                 string payloadName = GetPayloadName(payload);
@@ -77,7 +76,6 @@ namespace Quarkit.Core
                 }
 
                 List<ResolvedModule> resolvedModules = new List<ResolvedModule>(loadedModules.Count);
-                OverridesResolver resolver = new OverridesResolver();
                 foreach (LoadedModule module in loadedModules)
                 {
                     if(module.Manifest.Overrides == null)
@@ -89,7 +87,7 @@ namespace Quarkit.Core
                         });
                         continue;
                     }
-                    ModuleBlueprint blueprint = resolver.ResolveForTarget(module.Manifest.Default, [.. module.Manifest.Overrides], target, module.Manifest.Options);
+                    ModuleBlueprint blueprint = resolver.ResolveForTarget(module.Manifest.Default, [.. module.Manifest.Overrides], target, new(module.Manifest.Options ?? []));
                     resolvedModules.Add(new()
                     {
                         Blueprint = blueprint,

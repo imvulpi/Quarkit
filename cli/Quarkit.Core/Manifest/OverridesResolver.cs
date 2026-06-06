@@ -9,13 +9,14 @@ public class OverridesResolver
     /// Resolves the absolute, flat configuration for a single concrete target 
     /// by layering matching overrides on top of the defaults.
     /// </summary>
-    public T ResolveForTarget<T>(T defaultT, IBlueprintOverride<T>[] overrides, TargetKey targetKey, List<QkOptionDefinition>? availableOptions)
+    public T ResolveForTarget<T>(T defaultT, IBlueprintOverride<T>[] overrides, TargetKey targetKey, QkOptionResolver? qkOptionResolver = null)
         where T : IMergeable<T>
     {
         foreach (var blueprintOverride in overrides)
         {
-            if ((blueprintOverride.TargetKey.HasValue && IsMatch(targetKey, blueprintOverride.TargetKey.Value))
-                || (availableOptions != null && IsMatch(blueprintOverride.Expressions, availableOptions)))
+            bool noTargetOrTargetMatch = !blueprintOverride.TargetKey.HasValue || (blueprintOverride.TargetKey.HasValue && IsMatch(targetKey, blueprintOverride.TargetKey.Value));
+            bool noOptionsOrOptionsMatch = qkOptionResolver == null || IsMatch(blueprintOverride.Expressions, qkOptionResolver);
+            if (noTargetOrTargetMatch && noOptionsOrOptionsMatch)
             {
                 defaultT.MergeFrom(blueprintOverride.Value);
             }
@@ -24,12 +25,10 @@ public class OverridesResolver
         return defaultT;
     }
 
-    private bool IsMatch(List<string>? expressions, List<QkOptionDefinition> availableOptions)
+    private bool IsMatch(List<string>? expressions, QkOptionResolver resolver)
     {
         if (expressions == null || expressions.Count == 0) return true;
-
-        QkOptionResolver qkOptionResolver = new(availableOptions);
-        return qkOptionResolver.ExpressionsMatch(expressions);
+        return resolver.ExpressionsMatch(expressions);
     }
 
     private bool IsMatch(TargetKey concreteTarget, TargetKey overrideFilter)

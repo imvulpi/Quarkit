@@ -1,12 +1,10 @@
-﻿using Quarkit.Core.Installation;
+﻿using Quarkit.Core.Manifest;
 using Quarkit.Models.Manifest;
 
 namespace Quarkit.Tests;
 
-public class InstallationManifestEngineTests
+public class InstallationManifestOverridesTests
 {
-    private readonly InstallationManifestEngine _engine = new();
-
     [Test]
     public async Task CascadingOverrides_ShouldLayerPropertiesProgressively()
     {
@@ -19,13 +17,13 @@ public class InstallationManifestEngineTests
                 DesktopShortcut = true,
                 TargetPath = "/default/path"
             },
-            Overrides = new List<InstallOptionsOverrides>
-            {
+            Overrides =
+            [
                 // Matches ANY Windows target
                 new()
                 {
                     TargetKey = new TargetKey(OSSystem.Windows),
-                    Options = new(){
+                    Value = new(){
                         AdminRequired = true
                     }
                 },
@@ -33,7 +31,7 @@ public class InstallationManifestEngineTests
                 new()
                 {
                     TargetKey = new TargetKey(bit: Bitness.x64),
-                    Options = new(){
+                    Value = new(){
                         TargetPath = "/programfiles64/CoreApp"
                     }
                 },
@@ -41,16 +39,18 @@ public class InstallationManifestEngineTests
                 new()
                 {
                     TargetKey = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
-                    Options = new(){
+                    Value = new(){
                         DesktopShortcut = false
                     }
                 }
-            }
+            ]
         };
 
-        var concreteTarget = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64);
-        var resolved = _engine.ResolveForTarget(manifest, concreteTarget);
+        OverridesResolver resolver = new OverridesResolver();
+        TargetKey concreteTarget = new(OSSystem.Windows, Architecture.x86, Bitness.x64);
+        InstallOptions? resolved = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), concreteTarget, null);
 
+        await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved.AppName).IsEqualTo("CoreApp"); // From Default
         await Assert.That(resolved.AdminRequired).IsTrue(); // From 1st Override 
         await Assert.That(resolved.TargetPath).IsEqualTo("/programfiles64/CoreApp"); // From 2nd Override
@@ -63,15 +63,19 @@ public class InstallationManifestEngineTests
         var manifest = new InstallManifestEditor
         {
             Default = new InstallOptions { AppName = "BaseOnly", AdminRequired = false },
-            Overrides = new List<InstallOptionsOverrides>
-            {
-                new() { TargetKey = new TargetKey(OSSystem.Linux), Options = new(){ AdminRequired = true } }
-            }
+            Overrides =
+            [
+                new() { TargetKey = new TargetKey(OSSystem.Linux), Value = new(){ AdminRequired = true } }
+            ]
         };
 
-        var concreteWindowsTarget = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64);
-        var resolved = _engine.ResolveForTarget(manifest, concreteWindowsTarget);
+        OverridesResolver resolver = new();
+        TargetKey concreteWindowsTarget = new(OSSystem.Windows, Architecture.x86, Bitness.x64);
+        InstallOptions defaultOptions = InstallOptions.GetGlobalDefaults();
+        defaultOptions.MergeFrom(manifest.Default);
+        InstallOptions? resolved = resolver.ResolveForTarget(defaultOptions, manifest.Overrides.ToArray(), concreteWindowsTarget, null);
 
+        await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved.AdminRequired).IsFalse();
         await Assert.That(resolved.AppName).IsEqualTo("BaseOnly");
     }

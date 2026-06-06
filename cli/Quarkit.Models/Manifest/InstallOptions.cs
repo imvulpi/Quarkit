@@ -3,7 +3,7 @@
     /// <summary>
     /// Options on how should the installation be performed.
     /// </summary>
-    public class InstallOptions
+    public class InstallOptions : IMergeable<InstallOptions>
     {
         /// <summary>
         /// Name of the application.
@@ -65,7 +65,7 @@
         /// Layers properties from a source options object onto this instance, 
         /// ignoring any null values in the source.
         /// </summary>
-        public void MergeFrom(InstallOptions source)
+        public void MergeFrom(InstallOptions? source)
         {
             if (source == null) return;
 
