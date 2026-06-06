@@ -100,9 +100,9 @@ public class QkOptionResolverResolutionTests
     }
 
     [Test]
-    [Arguments("50", "100", QkOperator.Greater, true)]
+    [Arguments("100", "50", QkOperator.Greater, true)]
     [Arguments("50", "50", QkOperator.GreaterEqual, true)]
-    [Arguments("100", "50", QkOperator.Lesser, true)]
+    [Arguments("50", "100", QkOperator.Lesser, true)]
     [Arguments("50", "50", QkOperator.LesserEqual, true)]
     public async Task Number_Inequalities_ShouldEvaluateCorrectly(
         string localValue, string remoteValue, QkOperator op, bool expectedResult)

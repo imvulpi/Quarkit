@@ -42,6 +42,10 @@ namespace Quarkit.Core.Manifest
                 {
                     if(!ResolveExpression(parsedExpresion, optionDefinition)) return false;
                 }
+                else
+                {
+                    throw new InvalidOperationException($"Unknown option used in an expression: {parsedExpresion.Option}");
+                }
             }
             return true;
         }
@@ -124,22 +128,24 @@ namespace Quarkit.Core.Manifest
                     return true; // Always true
                 case QkOperator.Greater:
                     {
-                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && remoteDouble > localDouble) return true;
+                        // This is correct because the option is always on the left.
+                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && localDouble > remoteDouble) return true;
                         return false;
                     }
                 case QkOperator.GreaterEqual:
                     {
-                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && remoteDouble >= localDouble) return true;
+                        // This is correct because the option is always on the left.
+                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && localDouble >= remoteDouble) return true;
                         return false;
                     }
                 case QkOperator.Lesser:
                                         {
-                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && remoteDouble < localDouble) return true;
+                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && localDouble < remoteDouble) return true;
                         return false;
                     }
                 case QkOperator.LesserEqual:
                                         {
-                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && remoteDouble <= localDouble) return true;
+                        if (hasValue && double.TryParse(remoteValue, out double remoteDouble) && localDouble <= remoteDouble) return true;
                         return false;
                     }
                 default: return false;
