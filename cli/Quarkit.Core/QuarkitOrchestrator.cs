@@ -18,7 +18,12 @@ namespace Quarkit.Core
 
         public void Build(string manifestPath)
         {
-            if (File.Exists(manifestPath)) return;
+            if (!File.Exists(manifestPath))
+            {
+                Console.WriteLine($"Could not find the manifest in {manifestPath}");
+                return;
+            }
+
             var manifest = JsonSerializer.Deserialize<InstallerManifest>(File.ReadAllText(manifestPath));
             var manifestDir = Path.GetDirectoryName(manifestPath);
             if (manifest == null || manifestDir == null)
@@ -29,6 +34,7 @@ namespace Quarkit.Core
                 Console.WriteLine($"Exact file: {manifest}");
                 return;
             }
+            Console.WriteLine("Found a manifest.");
 
             string quarkitRoot = AppDomain.CurrentDomain.BaseDirectory; // Where .exe is located (Quakit.CLI.exe is always in root)
             TargetKey hostTarget = PayloadDiscoveryEngine.DiscoverHostTarget();
@@ -46,19 +52,25 @@ namespace Quarkit.Core
             PayloadDiscoveryEngine discoveryEngine = new(physicalFileSystem);
             ModulesEngine modulesEngine = new(quarkitRoot, physicalFileSystem, systemProcessRunner);
             BuildEngine buildEngine = new(physicalFileSystem, systemProcessRunner);
-            OverridesResolver resolver = new OverridesResolver();
+            OverridesResolver resolver = new();
 
             var payloads = discoveryEngine.DiscoverPayloads(manifest.AutoDiscovery?.TargetRootDirectory ?? "", manifest.AutoDiscovery?.TargetPayloadSuffix ?? "");
+            if(payloads.Count == 0)
+            {
+                Console.WriteLine("... No targets found!");
+            }
+
             foreach (var payload in payloads)
             {
+                Console.WriteLine($"\nBuilding the installer for {payload.Target.GetTriple()}.");
                 if (!IsManifestSupportiveOfTarget(manifest, payload.Target))
                 {
-                    Console.WriteLine($"Found a target: {payload.FolderName}(interpreted as: {payload.Target.GetTriple()}), but the target is not supported in the manifest. " +
-                                        $"If this is intented you can ignore this message.");
+                    Console.WriteLine($"Found a target: {payload.FolderName}(interpreted as: {payload.Target.GetTriple()}), but the target is not supported in the manifest. " + "If this is intented you can ignore this message.");
                 }
 
                 ShorthandEngine buildShorthandEngine = new(globalShorthandEngine);
-                var target = payload.Target;
+                TargetKey target = payload.Target;
+                string coreModuleDir = Path.Combine(quarkitRoot, Paths.GetInstallerDir(target.System));
 
                 InstallerBlueprint? resolvedOptions = resolver.ResolveForTarget(manifest.Default, manifest.Overrides.ToArray(), target, new(new Dictionary<string, Models.Core.QkOptionDefinition>()));
                 string scratchDir = Path.Join(quarkitRoot, "build", target.GetTriple());
@@ -70,41 +82,30 @@ namespace Quarkit.Core
                 buildShorthandEngine.SetToken("<ScratchPath>", scratchDir);
                 Console.WriteLine($"Target: {payload.AbsolutePayloadPath}");
 
-                List<LoadedModule> loadedModules = [];
-                string coreModuleDir = Path.Combine(quarkitRoot, Paths.GetInstallerDir(target.System));
-                loadedModules.Add(modulesEngine.FindAndLoadModule("", coreModuleDir)); // Should be first.
-                if (resolvedOptions.Modules != null)
+                string[] moduleIds;
+                if(resolvedOptions.Modules != null)
                 {
-                    foreach (var module in resolvedOptions.Modules)
-                        loadedModules.Add(modulesEngine.FindAndLoadModule(module, manifestDir));
+                    moduleIds = new string[resolvedOptions.Modules.Count + 1];
+                    moduleIds[0] = $"<QK>/{Paths.GetInstallerDir(target.System)}";
+                    Array.Copy(resolvedOptions.Modules.ToArray(), 0, moduleIds, 1, resolvedOptions.Modules.Count);
+                }
+                else
+                {
+                    moduleIds = new string[1];
+                    moduleIds[0] = $"<QK>/{Paths.GetInstallerDir(target.System)}";
                 }
 
-                List<ResolvedModule> resolvedModules = new List<ResolvedModule>(loadedModules.Count);
-                foreach (LoadedModule module in loadedModules)
-                {
-                    if (module.Manifest.Overrides == null)
-                    {
-                        resolvedModules.Add(new()
-                        {
-                            Blueprint = module.Manifest.Default,
-                            Module = module,
-                        });
-                        continue;
-                    }
-                    ModuleBlueprint blueprint = resolver.ResolveForTarget(module.Manifest.Default, [.. module.Manifest.Overrides], target, new(module.Manifest.Options ?? []));
-                    resolvedModules.Add(new()
-                    {
-                        Blueprint = blueprint,
-                        Module = module,
-                    });
-                }
+                ResolvedModule[] resolvedModules = modulesEngine.ResolveModules(moduleIds, manifestPath, target, resolver);
 
-
+                string modulesVerbose = "";
                 // Run commands that are marked as before build ones.
                 foreach (var resolved in resolvedModules)
                 {
+                    modulesVerbose += resolved.Module.Manifest.Id + ", ";
                     modulesEngine.RunPreBuildCommands(resolved.Module, resolved.Blueprint, buildShorthandEngine);
                 }
+
+                Console.WriteLine($"Modules: {modulesVerbose}");
 
                 buildEngine.Build(new()
                 {

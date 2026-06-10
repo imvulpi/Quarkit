@@ -20,6 +20,6 @@ namespace Quarkit.Core.Build
 
         // Direct domain engine objects
         public required InstallerBlueprint ResolvedOptions { get; init; }
-        public required List<ResolvedModule> ResolvedModules { get; init; } = [];
+        public required ResolvedModule[] ResolvedModules { get; init; } = [];
     }
 }

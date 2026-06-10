@@ -9,7 +9,7 @@
     "CompilerFlags": [
       "-DQUARKIT_BRIEFLZ_EXTRACTOR_MODULE"
     ],
-    "Dependencies": [],
+    "Dependencies": ["quarkit_extraction"],
     "PreBuildCommands": [
       {
         "Executable": "./<QkHostTriple>/blzpack.exe",

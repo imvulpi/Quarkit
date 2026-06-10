@@ -107,7 +107,7 @@ public class BuildEngineTests
                             }
                         }
                     }
-                })
+                }).ToArray()
         };
         fileSystem.WriteAllText("C:/Quarkit/modules/brieflz/src/brieflz.c", "// This is a module test.");
 
@@ -179,7 +179,7 @@ public class BuildEngineTests
             QuarkitRoot = "C:/Quarkit",
             Target = new TargetKey(OSSystem.Windows, Architecture.x86, Bitness.x64),
             ResolvedOptions = new InstallerBlueprint(),
-            ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB])
+            ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB]).ToArray()
         };
 
         engine.Build(parameters);

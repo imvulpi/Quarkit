@@ -1,6 +1,8 @@
-﻿using Quarkit.Core.Processes;
+﻿using Quarkit.Core.Manifest;
+using Quarkit.Core.Processes;
 using Quarkit.Core.Shorthand;
 using Quarkit.Core.Storage;
+using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest.Modules;
 using System.Text.Json;
 
@@ -41,10 +43,21 @@ namespace Quarkit.Core.Modules
             }
         }
 
+        public ResolvedModule[] ResolveModules(string[] moduleIds, string manifestPath, TargetKey target, OverridesResolver resolver)
+        {
+            ResolvedModule[] declaredModules = new ResolvedModule[moduleIds.Length];
+            for (int i = 0; i < moduleIds.Length; i++)
+            {
+                declaredModules[i] = ResolveModule(FindAndLoadModule(moduleIds[i], manifestPath), resolver, target);
+            }
+
+            return ResolveDependencies(declaredModules, manifestPath, resolver, target).ToArray();
+        }
+
         /// <summary>
         /// Resolve a module string from the installation options into a LoadedModule.
         /// </summary>
-        public LoadedModule FindAndLoadModule(string moduleDeclaration, string manifestDirectory)
+        public LoadedModule FindAndLoadModule(string moduleDeclaration, string manifestPath)
         {
             string? resolvedPath = null;
 
@@ -52,14 +65,18 @@ namespace Quarkit.Core.Modules
             {
                 string moduleName = moduleDeclaration.Substring(5);
                 if (_globalModulesIndex.TryGetValue(moduleName, out string? path)) resolvedPath = path;
+                else
+                {
+                    resolvedPath = Path.Combine(_qkRoot, moduleName);
+                }
             }
             else if (moduleDeclaration.StartsWith("./") || moduleDeclaration.StartsWith("../")) // Explicit relative path (./modules/custom)
             {
-                resolvedPath = Path.GetFullPath(Path.Combine(manifestDirectory, moduleDeclaration));
+                resolvedPath = Path.GetFullPath(Path.Combine(manifestPath, moduleDeclaration));
             }
             else // Implicit check (Try local directory first, fallback to indexed global)
             {
-                string localAttempt = Path.GetFullPath(Path.Combine(manifestDirectory, moduleDeclaration));
+                string localAttempt = Path.GetFullPath(Path.Combine(manifestPath, moduleDeclaration));
                 if (_fileSystem.DirectoryExists(localAttempt))
                 {
                     resolvedPath = localAttempt;
@@ -92,6 +109,45 @@ namespace Quarkit.Core.Modules
                 ManifestPath = manifestFilePath,
                 ModuleDirectory = resolvedPath
             };
+        }
+
+        public ResolvedModule ResolveModule(LoadedModule module, OverridesResolver resolver, TargetKey target)
+        {
+            if(module.Manifest.Overrides == null)
+            {
+                return new()
+                {
+                    Blueprint = module.Manifest.Default,
+                    Module = module
+                };
+            }
+
+            ModuleBlueprint blueprint = resolver.ResolveForTarget(module.Manifest.Default, [.. module.Manifest.Overrides], target, new(module.Manifest.Options ?? []));
+            return new() { Blueprint = blueprint, Module = module };
+        }
+
+        public IEnumerable<ResolvedModule> ResolveDependencies(IEnumerable<ResolvedModule> modules, string manifestPath, OverridesResolver resolver, TargetKey target, 
+            HashSet<string>? resolved = null)
+        {
+            List<ResolvedModule> finalList = [];
+            resolved ??= [];
+
+            foreach (ResolvedModule module in modules)
+            {
+                if (resolved.Contains(module.Module.Manifest.Id)) { continue; } // Skip because a dependency added it before and it would result in duplicate modules.
+                if (module.Blueprint.Dependencies != null && module.Blueprint.Dependencies.Values != null)
+                {
+                    foreach (string dependency in module.Blueprint.Dependencies.Values)
+                    {
+                        if (resolved.Contains(dependency)) continue;
+                        LoadedModule dependencyModule = FindAndLoadModule(dependency, manifestPath);
+                        ResolvedModule resolvedDependencyModule = ResolveModule(dependencyModule, resolver, target);
+                        finalList.AddRange(ResolveDependencies([resolvedDependencyModule], manifestPath, resolver, target, resolved));
+                    }
+                }
+                finalList.Add(module);
+            }
+            return finalList;
         }
 
         /// <summary>
