@@ -143,6 +143,7 @@ namespace Quarkit.Core.Modules
                         LoadedModule dependencyModule = FindAndLoadModule(dependency, manifestPath);
                         ResolvedModule resolvedDependencyModule = ResolveModule(dependencyModule, resolver, target);
                         finalList.AddRange(ResolveDependencies([resolvedDependencyModule], manifestPath, resolver, target, resolved));
+                        resolved.Add(dependency);
                     }
                 }
                 finalList.Add(module);
