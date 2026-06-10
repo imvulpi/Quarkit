@@ -131,10 +131,11 @@ namespace Quarkit.Core.Modules
         {
             List<ResolvedModule> finalList = [];
             resolved ??= [];
-
+            
             foreach (ResolvedModule module in modules)
             {
                 if (resolved.Contains(module.Module.Manifest.Id)) { continue; } // Skip because a dependency added it before and it would result in duplicate modules.
+                resolved.Add(module.Module.Manifest.Id);
                 if (module.Blueprint.Dependencies != null && module.Blueprint.Dependencies.Values != null)
                 {
                     foreach (string dependency in module.Blueprint.Dependencies.Values)
