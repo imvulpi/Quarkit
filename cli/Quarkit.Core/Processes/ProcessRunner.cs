@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Quarkit.Core.Processes;
 
@@ -16,13 +17,18 @@ public class ProcessRunner : IProcessRunner
             CreateNoWindow = true
         };
 
-        using var process = Process.Start(startInfo);
-        if (process != null)
+        using var process = new Process { StartInfo = startInfo };
+        var outputBuilder = new StringBuilder();
+        var errorBuilder = new StringBuilder();
+        process.OutputDataReceived += (sender, e) => { if (e.Data != null) outputBuilder.AppendLine(e.Data); };
+        process.ErrorDataReceived += (sender, e) => { if (e.Data != null) errorBuilder.AppendLine(e.Data); };
+
+        if (process.Start())
         {
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             process.WaitForExit();
-            return (process.ExitCode, output, error);
+            return (process.ExitCode, outputBuilder.ToString(), errorBuilder.ToString());
         }
 
         return (0, string.Empty, string.Empty);
