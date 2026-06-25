@@ -26,7 +26,7 @@ public class BuildEngineTests
             ResolvedModules = []
         };
 
-        engine.Build(parameters);
+        engine.Build(parameters, new());
 
         // Verify auto-createation of missing directories
         await Assert.That(fileSystem.DirectoryExists("C:/Output/bin")).IsTrue();
@@ -61,7 +61,7 @@ public class BuildEngineTests
             ResolvedModules = []
         };
 
-        engine.Build(parameters);
+        engine.Build(parameters, new());
 
         // Verify binary name change to cross-linux-gnueabihf-gcc toolchain with no "-target" flag leaks
         var cmd = processRunner.History[0];
@@ -111,7 +111,7 @@ public class BuildEngineTests
         };
         fileSystem.WriteAllText("C:/Quarkit/modules/brieflz/src/brieflz.c", "// This is a module test.");
 
-        engine.Build(parameters);
+        engine.Build(parameters, new());
 
         string args = processRunner.History[0].Arguments;
 
@@ -182,7 +182,7 @@ public class BuildEngineTests
             ResolvedModules = ModuleMockHelper.GetResolvedModulesFromDefaults([moduleA, moduleB]).ToArray()
         };
 
-        engine.Build(parameters);
+        engine.Build(parameters, new());
 
         string args = processRunner.History[0].Arguments;
         args = MockFileSystem.Normalize(args); // Normalize to our mock system.
@@ -222,7 +222,7 @@ public class BuildEngineTests
             ResolvedModules = []
         };
 
-        var action = () => engine.Build(parameters);
+        var action = () => engine.Build(parameters, new());
 
         var exception = await Assert.That(action).Throws<Exception>();
         await Assert.That(exception).IsNotNull();

@@ -1,4 +1,5 @@
 ﻿using Quarkit.Core.Processes;
+using Quarkit.Core.Shorthand;
 using Quarkit.Core.Storage;
 using Quarkit.Models.Core.Target;
 using Quarkit.Models.Manifest.Modules;
@@ -17,7 +18,7 @@ namespace Quarkit.Core.Build
         }
 
         public const string ESC_STRING = "\"\\\"";
-        public void Build(BuildParameters parameters)
+        public void Build(BuildParameters parameters, ShorthandEngine shorthandEngine)
         {
             string? outputFolder = Path.GetDirectoryName(parameters.OutputPath);
             if (!string.IsNullOrEmpty(outputFolder) && !_fileSystem.DirectoryExists(outputFolder))
@@ -26,7 +27,7 @@ namespace Quarkit.Core.Build
             }
 
             var args = new List<string>();
-
+                 
             ApplyTargetFlags(args, parameters);
             ApplyOptimizationArguments(args, parameters.CompilerType);
 
@@ -45,6 +46,7 @@ namespace Quarkit.Core.Build
             {
                 FileInfo info = new(parameters.PayloadPath);
                 args.Add($"-DQUARKIT_PAYLOAD_SIZE={info.Length}"); // Payload size. (This doesn't change).
+                args.Add($"-DQUARKIT_OG_PAYLOAD_SIZE={shorthandEngine.Expand("<OriginalPayloadSize>")}");
                 args.Add($"-DQUARKIT_PAYLOAD_NAME={ESC_STRING}{parameters.PayloadName}{ESC_STRING}");
             }
             else
@@ -55,16 +57,20 @@ namespace Quarkit.Core.Build
             var dynamicModuleInits = new List<string>();
             var dynamicModuleDeInits = new List<string>();
             var dynamicModuleExterns = new List<string>();
+            var modulesAbsoluteSources = new List<string[]>();
             foreach (var resolved in parameters.ResolvedModules)
             {
-                if (HasHook(resolved, resolved.Blueprint.HasInitHook, "init"))
+                string[] absoluteSources = GetSourcePaths(resolved, shorthandEngine);
+                modulesAbsoluteSources.Add(absoluteSources);
+
+                if (HasHook(resolved, resolved.Blueprint.HasInitHook, "init", absoluteSources[0]))
                 {
                     Console.WriteLine($"Found a init hook: {$"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_init();"}");
                     dynamicModuleInits.Add($"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_init();");
                     dynamicModuleExterns.Add($"extern void quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_init(void);");
                 }
 
-                if (HasHook(resolved, resolved.Blueprint.HasDeInitHook, "deinit"))
+                if (HasHook(resolved, resolved.Blueprint.HasDeInitHook, "deinit", absoluteSources[0]))
                 {
                     Console.WriteLine($"Found a deinit hook: {$"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_deinit();"}");
                     dynamicModuleDeInits.Add($"quarkit_{resolved.Module.Manifest.Id.Replace("-", "_")}_deinit();");
@@ -92,17 +98,23 @@ namespace Quarkit.Core.Build
                 args.Add($"-DQUARKIT_MODULE_EXTERNS=\"{joinedExterns}\"");
             }
 
-            foreach (var resolved in parameters.ResolvedModules)
+
+            foreach (var modulePaths in modulesAbsoluteSources)
             {
-                foreach (var sourceFile in resolved.GetAbsoluteCSources())
+                foreach (var modulePath in modulePaths)
                 {
-                    args.Add($"\"{sourceFile}\"");
+                    if (modulePath[0] == '-' && (modulePath[1] == 'l' || modulePath[1] == 'L' || modulePath[1] == 'I'))
+                    {
+                        args.Add(modulePath[0..2] + $"\"{modulePath[2..]}\"");
+                        continue;
+                    }
+                    args.Add($"\"{modulePath}\"");
                 }
             }
 
             string formattedArgs = string.Join(" ", args);
             Console.WriteLine($"Running: {parameters.CompilerName} {formattedArgs}");
-            var result = _processRunner.Execute(parameters.CompilerName, formattedArgs);
+            var result = _processRunner.Execute(parameters.CompilerName, formattedArgs);    
 
             if (result.ExitCode != 0)
             {
@@ -147,14 +159,14 @@ namespace Quarkit.Core.Build
             }
         }
 
-        private bool HasHook(ResolvedModule resolvedMod, bool? hookOption, string hookName)
+        private bool HasHook(ResolvedModule resolvedMod, bool? hookOption, string hookName, string firstSourcePath)
         {
             if (hookOption == null)
             {
                 if (resolvedMod.Blueprint.CSources == null || resolvedMod.Blueprint.CSources?.Values?.Count <= 0) return false;
 
                 // Very simple check inside the first file
-                foreach (string line in _fileSystem.ReadLines(resolvedMod.GetAbsoluteCSources().First()))
+                foreach (string line in _fileSystem.ReadLines(firstSourcePath))
                 {
                     if (line.Contains("void") && line.Contains("quarkit") && line.Contains(hookName))
                     {
@@ -183,6 +195,46 @@ namespace Quarkit.Core.Build
             }
 
             return false;
+        }
+
+        private string[] GetSourcePaths(ResolvedModule module, ShorthandEngine shorthandEngine)
+        {
+            if (module.Blueprint.CSources == null) return [];
+            if (module.Blueprint.CSources.Values == null) return [];
+
+            string[] paths = new string[module.Blueprint.CSources.Values.Count];
+
+            for (int i = 0; i < module.Blueprint.CSources.Values.Count; i++)
+            {
+                string source = shorthandEngine.Expand(module.Blueprint.CSources.Values[i].Trim());
+                if (source.StartsWith("./"))
+                {
+                    paths[i] = Path.Combine(module.Module.ModuleDirectory, source);
+                    continue;
+                }
+                else
+                {
+                    string sourcePath = Path.Combine(module.Module.ModuleDirectory, source);
+                    if (File.Exists(sourcePath)) 
+                    {
+                        paths[i] = sourcePath;
+                        continue;
+                    }
+
+                    if (source.Length <= 2) throw new Exception($"Source: '{source}' from {module.Module.Manifest.Id} is too short.");
+                    if (source[0] == '-' && (source[1] == 'l' || source[1] == 'L' || source[1] == 'I'))
+                    {
+                        string sourceNoFlags = Path.Combine(module.Module.ModuleDirectory, source[2..]);
+                        if (File.Exists(sourceNoFlags))
+                        {
+                            paths[i] = source[0..2] + Path.GetFullPath(sourceNoFlags); // source with the option.
+                            continue;
+                        }
+                    }
+                }
+                throw new InvalidDataException($"Source: '{source}' from {module.Module.Manifest.Id} module does not exist.");
+            }
+            return paths;
         }
 
         private string GetGccTargetWindows(Architecture targetArch, Bitness targetBitness)

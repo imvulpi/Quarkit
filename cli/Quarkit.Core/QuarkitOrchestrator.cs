@@ -77,9 +77,19 @@ namespace Quarkit.Core
 
                 string payloadName = GetPayloadName(payload);
                 Directory.CreateDirectory(scratchDir);
+                if (File.Exists(payload.AbsolutePayloadPath)) // TODO: Support directories with tar too.
+                {
+                    buildShorthandEngine.SetToken("<OriginalPayloadSize>", new FileInfo(payload.AbsolutePayloadPath).Length.ToString());
+                }
+
                 buildShorthandEngine.SetToken("<PayloadPath>", payload.AbsolutePayloadPath);
                 buildShorthandEngine.SetToken("<PayloadName>", payloadName);
                 buildShorthandEngine.SetToken("<ScratchPath>", scratchDir);
+                buildShorthandEngine.SetToken("<QkTargetTriple>", target.GetTriple());
+                buildShorthandEngine.SetToken("<QkTargetSystem>", target.System.AsString());
+                buildShorthandEngine.SetToken("<QkTargetArchitecture>", target.Arch.AsString());
+                buildShorthandEngine.SetToken("<QkTargetBitness>", target.Bit.AsString());
+
                 Console.WriteLine($"Target: {payload.AbsolutePayloadPath}");
 
                 string[] moduleIds;
@@ -110,7 +120,7 @@ namespace Quarkit.Core
                 buildEngine.Build(new()
                 {
                     ResolvedModules = resolvedModules,
-                    OutputPath = Path.Combine(manifestDir, manifest.OutputPath ?? DEFAULT_DISTRIBUTION_DIR, $"{target.GetTriple()}", $"{manifest.Default.AppName}_qkinstaller.exe"),
+                    OutputPath = Path.Combine(manifestDir, manifest.OutputPath ?? DEFAULT_DISTRIBUTION_DIR, $"{target.GetTriple()}", $"{manifest.Default.AppName}_quarkit.exe"),
                     QuarkitRoot = quarkitRoot,
                     ResolvedOptions = resolvedOptions,
                     PayloadPath = buildShorthandEngine.Expand("<PayloadPath>"),
@@ -118,7 +128,7 @@ namespace Quarkit.Core
                     Target = target,
                     CompilerName = manifest.CreatorOptions == null ? "clang" : manifest.CreatorOptions.CompilerName,
                     CompilerType = CompilerType.Clang
-                });
+                }, buildShorthandEngine);
             }
         }
 
