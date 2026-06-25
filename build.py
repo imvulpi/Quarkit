@@ -6,7 +6,7 @@ import sys
 from scripts.build_config import BuildConfig
 from scripts.build_enums import Arch, Bitness, CompilerType, System
 from scripts.cli import cli
-from scripts.globals import DIST_DIR, MODULES_DIR
+from scripts.globals import DIST_DIR, MODULES_OUTPUT_DIR
 from scripts.modules import brieflz, lzma, other
 
 def main():
@@ -33,10 +33,10 @@ def main():
     for config in configs:
         cli.build(config)
         dist_modules = f"{DIST_DIR}/{config.get_triple()}/modules"
-        shutil.copytree(MODULES_DIR, dist_modules, dirs_exist_ok=True)
+        shutil.copytree(MODULES_OUTPUT_DIR, dist_modules, dirs_exist_ok=True)
         shutil.copytree("installer", f"output/{config.get_triple()}/installer", dirs_exist_ok=True)
 
-    shutil.rmtree(MODULES_DIR)
+    shutil.rmtree(MODULES_OUTPUT_DIR)
     
 if __name__ == "__main__":
     main()

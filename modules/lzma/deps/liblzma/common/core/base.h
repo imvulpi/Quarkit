@@ -12,7 +12,7 @@
 
 #pragma once
 #include "quarkit_glue.h"
-#include "../../../../xz_glue.h"
+#include "xz_glue.h"
 
 /**
  * \brief       Boolean

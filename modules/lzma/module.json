@@ -1,0 +1,25 @@
+{
+  "Id": "lzma", 
+  "Version": "1.0.0",
+  "Default": {
+    "HasInitHook": true,
+    "CSources": [
+      "./src/lzma-extractor.c",
+      "./<QkTargetTriple>/liblzma.a"
+    ],
+    "CompilerFlags": [
+      "-DQUARKIT_LZMA_MODULE"
+    ],
+    "Dependencies": ["quarkit_extraction"],
+    "PreBuildCommands": [
+      {
+        "Executable": "./<QkHostTriple>/lzmacompressor.exe",
+        "Arguments": "<PayloadPath> <ScratchPath>/<PayloadName>.lzma2",
+        "CaptureVariables": false,
+        "ShorthandOverrides":{
+          "<PayloadPath>": "<ScratchPath>/<PayloadName>.lzma2"
+        }
+      }
+    ]
+  }
+}

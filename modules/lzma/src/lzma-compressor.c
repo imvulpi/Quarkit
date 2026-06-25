@@ -1,8 +1,8 @@
 // Tool the modules uses to create compressed packages using lzma2
 // This is not included in the installer.
 
-#include "./deps/liblzma/common/block_encoder.h"
-#include "./deps/liblzma/common/core/lzma12.h"
+#include "../deps/liblzma/common/block_encoder.h"
+#include "../deps/liblzma/common/core/lzma12.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 import glob
 import os
+from pathlib import Path
+import shutil
 from .build_enums import *
 
 @dataclass
@@ -16,7 +18,7 @@ class BuildConfig:
     
 def get_source_files(pattern, excludes=[]):
     """Globs files matching the pattern and removes any files containing exclusion strings."""
-    files = glob.glob(pattern)
+    files = glob.glob(pattern, recursive=True)
 
     # Filter out files that match any of our exclusion substrings
     filtered_files = [
@@ -25,3 +27,10 @@ def get_source_files(pattern, excludes=[]):
         if not any(exclude in os.path.basename(f) for exclude in excludes)
     ]
     return filtered_files
+
+def copy_files(pattern, output, excludes=[]):
+    header_paths = get_source_files(f"{pattern}", excludes)
+    for header_path in header_paths:
+        output_path = Path(output, header_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(header_path, output_path)
