@@ -1,0 +1,12 @@
+{
+  "Id": "quarkit_logging",
+  "Version": "1.0.0",
+  "Default": {
+    "CSources": [
+      "src/log.c"
+    ],
+    "CompilerFlags": [
+      "-DQUARKIT_LOGGING_MODULE"
+    ]
+  }
+}
