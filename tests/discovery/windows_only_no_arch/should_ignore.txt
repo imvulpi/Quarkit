@@ -1,0 +1,1 @@
+This directory and files should be ignored because they don't have any triple.

@@ -1,0 +1,1 @@
+This is Quarkit's testing package. Yes, Quarkit can package regular files.
