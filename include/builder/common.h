@@ -20,22 +20,22 @@ bool file_exists(const char *filename) {
 
 /**
  * Invokes an expression, stores the result in a local status variable,
- * and jumps to the error label if it fails.
+ * and jumps to the cleanup label if it fails.
  */
 #define TRY_GOTO(expr) do { \
     status = (expr); \
-    if (status != QKIT_OK) goto error; \
+    if (status != QKIT_OK) goto cleanup; \
 } while(0)
 
 /**
  * Invokes an expression, stores the result in a local status, if fails, 
- * it prints a formatted error message to stderr, and jumps to the error label.
+ * it prints a formatted error message to stderr, and jumps to the cleanup label.
  */
 #define TRY_GOTO_PRINT(expr, fmt, ...) do { \
     status = (expr); \
     if (status != QKIT_OK) { \
         fprintf(stderr, fmt "\n", ##__VA_ARGS__); \
-        goto error; \
+        goto cleanup; \
     } \
 } while(0)
 

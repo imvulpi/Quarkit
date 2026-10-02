@@ -129,7 +129,7 @@ int qkit_deserialize_manifest(qkit_manifest* manifest, char* path){
     *manifest = temp;
     return QKIT_OK;
 
-    error:
+    cleanup:
         qkit_free_manifest(&temp);
         toml_free(toml);
         return status;
