@@ -64,6 +64,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         ${LZ4_SRC}
         ${KLIB_SRC}
         builder/manifest.c
+        vendor/dirent/dirent.h
     )
 
     target_include_directories(qkit_builder PUBLIC
