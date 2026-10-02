@@ -27,13 +27,13 @@ void qkit_print_manifest(const qkit_manifest *manifest)
     printf("========================================\n");
     printf(" Loaded Manifest Configuration:\n");
     printf("========================================\n");
-    printf("  * start_shortcut : %s\n", manifest->start_shortcut ? "true" : "false");
-    printf("  * admin_required : %s\n", manifest->admin_required ? "true" : "false");
-    printf("  * search_dir     : %s\n", manifest->search_dir.s);
-    printf("  * target_dir     : %s\n", manifest->target_dir.s);
-    printf("  * package_name   : %s\n", manifest->package_name.s);
-    printf("  * launch_name    : %s\n", manifest->launch_name.s);
-    printf("  * output_path    : %s\n", manifest->output_path.s);
+    printf("  * start_shortcut  : %s\n", manifest->start_shortcut ? "true" : "false");
+    printf("  * admin_required  : %s\n", manifest->admin_required ? "true" : "false");
+    printf("  * payload_dir     : %s\n", manifest->payload_dir.s);
+    printf("  * payload_subpath : %s\n", manifest->payload_subpath.s);
+    printf("  * package_name    : %s\n", manifest->package_name.s);
+    printf("  * main_executable : %s\n", manifest->main_executable.s);
+    printf("  * install_path    : %s\n", manifest->install_path.s);
     printf("========================================\n\n");
 }
 
@@ -106,7 +106,7 @@ static int deserialize_field(toml_datum_t* table, const char* field_key, toml_ty
     return QKIT_OK;
 }
 
-int qkit_deserialize_manifest(qkit_manifest* manifest, char* path){
+int qkit_deserialize_manifest(qkit_manifest* manifest, const char* path){
     toml_result_t toml = toml_parse_file_ex(path);
     TRY_CUSTOM_PRINT(
         !toml.ok, 
@@ -119,11 +119,11 @@ int qkit_deserialize_manifest(qkit_manifest* manifest, char* path){
     int status = QKIT_OK;
     TRY_GOTO(deserialize_field(&toml.toptab, "start_shortcut", TOML_BOOLEAN, &temp.start_shortcut, false));
     TRY_GOTO(deserialize_field(&toml.toptab, "admin_required", TOML_BOOLEAN, &temp.admin_required, true));
-    TRY_GOTO(deserialize_field(&toml.toptab, "search_dir", TOML_STRING, &temp.search_dir, true));
-    TRY_GOTO(deserialize_field(&toml.toptab, "target_dir", TOML_STRING, &temp.target_dir, true));
+    TRY_GOTO(deserialize_field(&toml.toptab, "payload_dir", TOML_STRING, &temp.payload_dir, true));
+    TRY_GOTO(deserialize_field(&toml.toptab, "payload_subpath", TOML_STRING, &temp.payload_subpath, true));
     TRY_GOTO(deserialize_field(&toml.toptab, "package_name", TOML_STRING,&temp.package_name, true));
-    TRY_GOTO(deserialize_field(&toml.toptab, "launch_name", TOML_STRING, &temp.launch_name, true));
-    TRY_GOTO(deserialize_field(&toml.toptab, "output_path", TOML_STRING, &temp.output_path, true));
+    TRY_GOTO(deserialize_field(&toml.toptab, "main_executable", TOML_STRING, &temp.main_executable, true));
+    TRY_GOTO(deserialize_field(&toml.toptab, "install_path", TOML_STRING, &temp.install_path, true));
 
     temp.internal = toml;
     *manifest = temp;
@@ -136,10 +136,10 @@ int qkit_deserialize_manifest(qkit_manifest* manifest, char* path){
 }
 
 void qkit_free_manifest(qkit_manifest* manifest){
-    free(manifest->search_dir.s);
-    free(manifest->target_dir.s);
+    free(manifest->payload_dir.s);
+    free(manifest->payload_subpath.s);
     free(manifest->package_name.s);
-    free(manifest->launch_name.s);
-    free(manifest->output_path.s);
+    free(manifest->main_executable.s);
+    free(manifest->install_path.s);
     toml_free(manifest->internal);
 }
