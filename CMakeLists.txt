@@ -11,12 +11,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     set(MINIPAXTAR_SRC ${VENDOR_DIR}/minipaxtar/minipaxtar.c)
     set(MINIZ_SRC ${VENDOR_DIR}/miniz/miniz.c)
     set(LZ4_SRC ${VENDOR_DIR}/lz4/lib/lz4.c)
+    set(KLIB_SRC ${VENDOR_DIR}/klib/kstring.c)
     set(BUILDER_VENDOR_INCLUDES
         ${VENDOR_DIR}/tomlc17
         ${VENDOR_DIR}/minipaxtar
         ${VENDOR_DIR}/miniz
         ${VENDOR_DIR}/lz4
         ${VENDOR_DIR}/zstd/lib
+        ${VENDOR_DIR}/klib
     )
 # END - Vendored Paths & Sources
 
@@ -60,10 +62,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         ${MINIPAXTAR_SRC}
         ${MINIZ_SRC}
         ${LZ4_SRC}
+        ${KLIB_SRC}
+        builder/manifest.c
     )
 
-    target_include_directories(qkit_builder PRIVATE
-        ./include/builder
+    target_include_directories(qkit_builder PUBLIC
+        include
         ${BUILDER_VENDOR_INCLUDES}
     )
 
@@ -80,7 +84,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     )
 
     target_include_directories(quarkit PRIVATE
-        builder
         ${BUILDER_VENDOR_INCLUDES}
     )
 

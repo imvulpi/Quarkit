@@ -1,7 +1,21 @@
 #pragma once
 
+#include <stdbool.h>
+#include <stdio.h>
+
 #define QKIT_OK   0
 #define QKIT_ERR -1
+#define QKIT_MANIFEST_MISSING   -2
+#define QKIT_DESERIALIZE_FAILED -3
+
+bool file_exists(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file != NULL) {
+        fclose(file);
+        return true;
+    }
+    return false;
+}
 
 /**
  * Invokes an expression, stores the result in a local status variable,
