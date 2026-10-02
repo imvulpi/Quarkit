@@ -28,15 +28,15 @@ int main(int argc, char *argv[])
                 manifest_path = arg_str;
                 continue;
             }
-
+            
             previous_option = QKIT_CLI_OPTION_NONE;
             
-            if(strncmp(arg_str, "-h", 2) == 0
-            || strncmp(arg_str, "--help", 6) == 0
-            || strncmp(arg_str, "help", 4) == 0){
+            if(strncmp(arg_str, STR_LEN("-h")) == 0
+            || strncmp(arg_str, STR_LEN("--help")) == 0
+            || strncmp(arg_str, STR_LEN("help")) == 0){
                 print_help();
                 return QKIT_OK;
-            }else if(strncmp(arg_str, "--manifest", 10) == 0){
+            }else if(strncmp(arg_str, STR_LEN("--manifest")) == 0){
                 previous_option = QKIT_CLI_OPTION_MANIFEST;
             }else{
                 printf("Unknown option: %s\n", arg_str);

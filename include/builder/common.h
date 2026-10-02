@@ -7,6 +7,7 @@
 #define QKIT_ERR -1
 #define QKIT_MANIFEST_MISSING   -2
 #define QKIT_DESERIALIZE_FAILED -3
+#define STR_LEN(s) (s), (sizeof(s) - 1) /**< Creates a string + length pair from a string literal. Useful for bounded string passes. */
 
 bool file_exists(const char *filename) {
     FILE *file = fopen(filename, "r");
