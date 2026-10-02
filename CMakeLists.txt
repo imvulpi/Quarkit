@@ -19,6 +19,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         ${VENDOR_DIR}/lz4
         ${VENDOR_DIR}/zstd/lib
         ${VENDOR_DIR}/klib
+        ${VENDOR_DIR}/dirent
     )
 # END - Vendored Paths & Sources
 
@@ -65,7 +66,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         ${KLIB_SRC}
         builder/manifest.c
         builder/discovery.c
-        vendor/dirent/dirent.h
     )
 
     target_include_directories(qkit_builder PUBLIC

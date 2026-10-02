@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <dirent.h>
+#if defined(_WIN32)
+    #include "win_dirent.h"
+#else
+    #include <dirent.h>
+#endif
 #include "builder/discovery.h"
 #include "builder/common.h"
 #include "kvec.h"
@@ -62,7 +66,7 @@ void qkit_print_discoveries(const qkit_discovery_vec *discovery_vec)
 
     size_t count = kv_size(*discovery_vec);
     printf("========================================\n");
-    printf(" Discovered Payloads Summary (%lld items):\n", count);
+    printf(" Discovered Payloads Summary (%zu items):\n", count);
     printf("========================================\n");
 
     for (size_t i = 0; i < count; ++i) {
@@ -215,7 +219,7 @@ int qkit_discover_payloads(const char *path, qkit_discovery_vec *discoveries)
     int status = QKIT_OK;
     struct dirent *de;
     while ((de = readdir(dr)) != NULL) {
-        size_t namelen = de->d_namlen;
+        size_t namelen = strlen(de->d_name);
         if ((namelen == 2 && de->d_name[0] == '.' && de->d_name[1] == '.')
         || (namelen == 1 && de->d_name[0] == '.')) continue;
 
@@ -263,14 +267,14 @@ cleanup:
 }
 
 void qkit_discovery_free(qkit_discovery *discovery) {
-    if(discovery == NULL) return;
+    if (discovery == NULL) return;
     free(discovery->triple);
     free(discovery->name.s);
     free(discovery);
 }
 
 void qkit_discovery_free_vec(qkit_discovery_vec *discovery_vec) {
-    if(discovery_vec == NULL) return;
+    if (discovery_vec == NULL) return;
     for (size_t i = 0; i < discovery_vec->n; i++) qkit_discovery_free(discovery_vec->a[i]);
     kv_destroy(*discovery_vec);
 }
