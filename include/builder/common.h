@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -9,13 +10,18 @@
 #define QKIT_DESERIALIZE_FAILED -3
 #define STR_LEN(s) (s), (sizeof(s) - 1) /**< Creates a string + length pair from a string literal. Useful for bounded string passes. */
 
-bool file_exists(const char *filename) {
+static bool file_exists(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (file != NULL) {
         fclose(file);
         return true;
     }
     return false;
+}
+
+static char* strnlwr(char *str, size_t n){
+    for (size_t i = 0; i < n; i++) str[i] = tolower(str[i]);
+    return str;
 }
 
 /**
@@ -90,7 +96,6 @@ bool file_exists(const char *filename) {
         return (err_val); \
     } \
 } while(0)
-
 
 /**
  * Invokes a custom expression in an if statement, if the statement succeeds 

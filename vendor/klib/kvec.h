@@ -76,6 +76,24 @@ int main() {
 		(v).a[(v).n++] = (x);										\
 	} while (0)
 
+/** @brief Safer version of @c kv_push due to allowing errors to be checked via @c out_ok */
+#define qkit_kv_push(type, v, x, out_ok) do { \
+	(out_ok) = 1; \
+	if ((v).n == (v).m) { \
+		size_t new_m = (v).m ? ((v).m << 1) : 2; \
+		type *tmp = (type*)realloc((v).a, sizeof(type) * new_m); \
+		if (tmp == NULL) { \
+			(out_ok) = 0; \
+		} else { \
+			(v).a = tmp; \
+			(v).m = new_m; \
+		} \
+	} \
+	if (out_ok) { \
+		(v).a[(v).n++] = (x); \
+	} \
+} while (0)
+
 #define kv_pushp(type, v) (((v).n == (v).m)?							\
 						   ((v).m = ((v).m? (v).m<<1 : 2),				\
 							(v).a = (type*)realloc((v).a, sizeof(type) * (v).m), 0)	\

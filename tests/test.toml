@@ -1,7 +1,11 @@
 start_shortcut = true
 admin_required = false
-search_dir = "tests" 
-target_dir = "test"
+
 package_name = "TestConfig"
-launch_name = "test.exe"
-output_path = "tests/outputs"
+main_executable = "test.exe"
+
+payload_dir = "tests/discovery" 
+payload_subpath = "test"
+
+install_path = "{PROGRAM_FILES}/Quarkit/Tests"
+artifact_dir = "tests/outputs"

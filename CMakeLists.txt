@@ -64,6 +64,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         ${LZ4_SRC}
         ${KLIB_SRC}
         builder/manifest.c
+        builder/discovery.c
         vendor/dirent/dirent.h
     )
 

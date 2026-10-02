@@ -1,4 +1,5 @@
 #include "builder/common.h"
+#include <builder/discovery.h>
 #include <builder/manifest.h>
 
 #define QKIT_CLI_OPTION_NONE 0
@@ -63,6 +64,10 @@ int main(int argc, char *argv[])
 
     printf("[OK] Successfully loaded manifest from: %s\n", manifest_path);    
     qkit_print_manifest(&manifest);
+
+    qkit_discovery_vec discoveries = {0};
+    qkit_discover_payloads(manifest.payload_dir.s, &discoveries);
+    qkit_print_discoveries(&discoveries);
 
     return QKIT_OK;
 }
