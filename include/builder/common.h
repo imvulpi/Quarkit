@@ -153,6 +153,7 @@ static bool file_exists(const char *filename)
 #endif
 }
 static char* strnlwr(char *str, size_t n){
+    if (str == NULL) return NULL;
     for (size_t i = 0; i < n; i++) str[i] = tolower(str[i]);
     return str;
 }
