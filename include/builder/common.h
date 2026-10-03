@@ -28,11 +28,6 @@
 #define QKIT_DESERIALIZE_FAILED -3
 #define STR_LEN(s) (s), (sizeof(s) - 1) /**< Creates a string + length pair from a string literal. Useful for bounded string passes. */
 
-static bool file_exists(const char *filename) {
-    FILE *file = fopen(filename, "r");
-    if (file != NULL) {
-        fclose(file);
-        return true;
 /**
  * @brief Converts POSIX-style forward slashes to Windows-style backslashes in-place.
  * 
@@ -102,6 +97,28 @@ static int qkit_remove_dir_recursive(const char *path)
     return result;
 #else
     return nftw(path, qkit_unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+#endif
+}
+/**
+ * @brief Checks whether a file or directory exists at the given path.
+ * 
+ * Uses access checks (or standard stat checks on POSIX / Win32 API on Windows)
+ * to verify path presence without opening the resource.
+ * 
+ * @param[in] filename Path to the file or directory to check.
+ * @return true if the file or directory exists, false otherwise or if filename is NULL.
+ */
+static bool file_exists(const char *filename)
+{
+    if (filename == NULL || *filename == '\0') {
+        return false;
+    }
+
+#if defined(_WIN32)
+    DWORD attr = GetFileAttributesA(filename);
+    return (attr != INVALID_FILE_ATTRIBUTES);
+#else
+    return access(filename, F_OK) == 0;
 #endif
 }
 static char* strnlwr(char *str, size_t n){
