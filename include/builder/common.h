@@ -99,6 +99,37 @@ static int qkit_remove_dir_recursive(const char *path)
     return nftw(path, qkit_unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 #endif
 }
+
+/**
+ * @brief Ensures that a directory exists, creating it if necessary.
+ * 
+ * Checks if the specified directory path exists. If it does not exist,
+ * attempts to create directories.
+ * 
+ * @param[in] path Path to the directory to verify or create.
+ * @return 0 on success (directory exists or was created), non-zero on failure.
+ */
+static int ensure_dir_exists(const char *path)
+{
+    if (path == NULL || *path == '\0') return QKIT_ERR;
+
+    size_t len = strlen(path); 
+    if (len >= 512) return QKIT_ERR;
+    char tmp[len+1];
+
+    memcpy(tmp, path, len + 1);
+
+    for (char *p = tmp + 1; *p; p++) {
+        if (*p == '/' || *p == '\\') {
+            *p = '\0';
+            mkdir_single(tmp);
+            *p = '/';
+        }
+    }
+    
+    return mkdir_single(tmp);
+}
+
 /**
  * @brief Checks whether a file or directory exists at the given path.
  * 
