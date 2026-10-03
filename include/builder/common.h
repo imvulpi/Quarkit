@@ -152,6 +152,17 @@ static bool file_exists(const char *filename)
     return access(filename, F_OK) == 0;
 #endif
 }
+
+/**
+ * @brief Converts up to `n` characters of a null-terminated string to lowercase in-place.
+ * 
+ * Safely iterates through the string up to `n` bytes or until the null terminator is
+ * reached, converting uppercase ASCII characters to lowercase.
+ * 
+ * @param[in,out] str Pointer to the string to convert.
+ * @param[in]     n   Maximum number of characters to process.
+ * @return Pointer to the modified string (`str`), or NULL if `str` is NULL.
+ */
 static char* strnlwr(char *str, size_t n){
     if (str == NULL) return NULL;
     for (size_t i = 0; i < n; i++) str[i] = tolower(str[i]);
