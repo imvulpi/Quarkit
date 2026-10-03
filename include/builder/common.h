@@ -170,6 +170,18 @@ static char* strnlwr(char *str, size_t n){
 }
 
 /**
+ * @brief Creates a isolated scratch directory in system temp.
+ * 
+ * Path format: <system_temp>/Quarkit/<timestamp>-<pid>-<triple_string>/
+ * 
+ * @param[in]  triple   Target triple profile to tag the folder name.
+ * @param[out] out_path Pointer to kstring_t where scratch directory path is stored.
+ * @return QKIT_OK on success, or QKIT_ERR on failure.
+ */
+int qkit_create_scratch_dir(const qkit_triple *triple, kstring_t *out_path);
+
+
+/**
  * Invokes an expression, stores the result in a local status variable,
  * and jumps to the cleanup label if it fails.
  */

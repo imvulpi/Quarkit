@@ -66,6 +66,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         ${KLIB_SRC}
         builder/manifest.c
         builder/discovery.c
+        builder/common.c
     )
 
     target_include_directories(qkit_builder PUBLIC
