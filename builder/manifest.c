@@ -137,9 +137,15 @@ int qkit_deserialize_manifest(qkit_manifest* manifest, const char* path){
 
 void qkit_free_manifest(qkit_manifest* manifest){
     free(manifest->payload_dir.s);
+    manifest->payload_dir = (kstring_t){0};
     free(manifest->payload_subpath.s);
+    manifest->payload_subpath = (kstring_t){0};
     free(manifest->package_name.s);
+    manifest->package_name = (kstring_t){0};
     free(manifest->main_executable.s);
+    manifest->main_executable = (kstring_t){0};
     free(manifest->install_path.s);
+    manifest->install_path = (kstring_t){0};
+
     toml_free(manifest->internal);
 }

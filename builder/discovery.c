@@ -270,6 +270,7 @@ void qkit_discovery_free(qkit_discovery *discovery) {
     if (discovery == NULL) return;
     free(discovery->triple);
     free(discovery->name.s);
+    discovery->name = (kstring_t){0};
     free(discovery);
 }
 
