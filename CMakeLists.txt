@@ -77,7 +77,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     if(WIN32)
         target_compile_definitions(qkit_builder PRIVATE BUILDER_EXPORTS)
+    else()
+        target_compile_definitions(qkit_builder PRIVATE 
+            _XOPEN_SOURCE=500 
+            _POSIX_C_SOURCE=200809L
+        )
     endif()
+
 # END - Builder API
 
 # Builder Executable
@@ -87,6 +93,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     target_include_directories(quarkit PRIVATE
         ${BUILDER_VENDOR_INCLUDES}
+    )
+
+    target_compile_definitions(quarkit PRIVATE 
+        _XOPEN_SOURCE=500 
+        _POSIX_C_SOURCE=200809L
     )
 
     # Link against the builder shared library (DLL) and zstd
